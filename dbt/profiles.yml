@@ -1,0 +1,13 @@
+ecommerce_fraud_dw:
+  target: dev
+
+  outputs:
+    dev:
+      type: postgres
+      host: "{{ env_var('DBT_POSTGRES_HOST', 'localhost') }}"
+      port: 5432
+      user: "{{ env_var('POSTGRES_USER', 'postgres') }}"
+      password: "{{ env_var('POSTGRES_PASSWORD') }}"
+      dbname: "{{ env_var('POSTGRES_DB', 'ecommerce_fraud_dw') }}"
+      schema: raw
+      threads: 4

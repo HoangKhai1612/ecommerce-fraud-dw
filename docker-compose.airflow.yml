@@ -1,0 +1,72 @@
+services:
+
+  airflow:
+    build:
+      context: .
+      dockerfile: Dockerfile.airflow
+
+    container_name: fraud_dw_airflow
+
+    restart: unless-stopped
+
+    ports:
+      - "8080:8080"
+
+    environment:
+      # ==========================================================
+      # AIRFLOW
+      # ==========================================================
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://postgres:%40Melons16122005@host.docker.internal:5432/airflow_db
+
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+
+      AIRFLOW__API__AUTH_BACKENDS: airflow.api.auth.backend.basic_auth
+
+      AIRFLOW_CONN_POSTGRES_DEFAULT: postgres://postgres:%40Melons16122005@host.docker.internal:5432/ecommerce_fraud_dw
+
+      AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: "true"
+
+      # ==========================================================
+      # POSTGRES / DBT
+      # ==========================================================
+      POSTGRES_HOST: host.docker.internal
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "@Melons16122005"
+      POSTGRES_DB: ecommerce_fraud_dw
+
+      DBT_POSTGRES_HOST: host.docker.internal
+      DBT_POSTGRES_USER: postgres
+      DBT_POSTGRES_PASSWORD: "@Melons16122005"
+      DBT_POSTGRES_DB: ecommerce_fraud_dw
+
+    volumes:
+      # ==========================================================
+      # AIRFLOW
+      # ==========================================================
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/plugins:/opt/airflow/plugins
+      - ./airflow/config:/opt/airflow/config
+
+      # ==========================================================
+      # PROJECT
+      # ==========================================================
+      - ./ingestion:/opt/airflow/ingestion
+      - ./dbt:/opt/airflow/dbt
+      - ./data:/opt/airflow/data
+
+    command: >
+      bash -c "
+        airflow db migrate &&
+        airflow users create
+          --username admin
+          --password admin
+          --firstname Admin
+          --lastname User
+          --role Admin
+          --email admin@example.com || true &&
+        airflow scheduler &
+        exec airflow webserver --port 8080
+      "

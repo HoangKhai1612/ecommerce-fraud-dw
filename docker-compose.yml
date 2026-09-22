@@ -1,0 +1,101 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: fraud_dw_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-ecommerce_fraud_dw}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-ecommerce_fraud_dw}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - fraud_dw_network
+
+  # FastAPI Application
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fraud_dw_api
+    restart: unless-stopped
+    environment:
+      API_HOST: 0.0.0.0
+      API_PORT: 8000
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-ecommerce_fraud_dw}
+      LLM_PROVIDER: ${LLM_PROVIDER:-ollama}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3}
+    ports:
+      - "${API_PORT:-8000}:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./api:/app/api
+      - ./data:/app/data
+      - ./ml/saved_models:/app/ml/saved_models
+    networks:
+      - fraud_dw_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+  # Optional: Ollama for local LLM (uncomment if using local LLM)
+  # ollama:
+  #   image: ollama/ollama:latest
+  #   container_name: fraud_dw_ollama
+  #   restart: unless-stopped
+  #   environment:
+  #     OLLAMA_NUM_GPU: 0  # Set to 1 if GPU available
+  #   ports:
+  #     - "11434:11434"
+  #   volumes:
+  #     - ollama_data:/root/.ollama
+  #   networks:
+  #     - fraud_dw_network
+
+  # Optional: Metabase for visualization (uncomment if using Metabase)
+  # metabase:
+  #   image: metabase/metabase:latest
+  #   container_name: fraud_dw_metabase
+  #   restart: unless-stopped
+  #   environment:
+  #     MB_DB_TYPE: postgres
+  #     MB_DB_DBNAME: ${POSTGRES_DB:-ecommerce_fraud_dw}
+  #     MB_DB_HOST: postgres
+  #     MB_DB_PORT: 5432
+  #     MB_DB_USER: ${POSTGRES_USER:-postgres}
+  #     MB_DB_PASS: ${POSTGRES_PASSWORD:-postgres}
+  #   ports:
+  #     - "${METABASE_PORT:-3000}:3000"
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   networks:
+  #     - fraud_dw_network
+
+volumes:
+  postgres_data:
+  # ollama_data:
+
+networks:
+  fraud_dw_network:
+    driver: bridge

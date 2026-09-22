@@ -1,0 +1,43 @@
+PHASE 10 — RAW LAYER VERIFICATION
+===================================
+Status: ✅ PASSED
+Date: 02/09/2026
+
+--- SQL Verification Results ---
+
+raw.transactions:
+  Rows: 590,540
+  Columns: 394
+  All columns data type: TEXT
+  TransactionID null count: 0
+  TransactionID unique: YES (590,540 unique out of 590,540 total)
+  Duplicate TransactionIDs: 0
+
+raw.identity:
+  Rows: 144,233
+  Columns: 41
+  All columns data type: TEXT
+
+Fraud distribution in raw.transactions:
+  Non-Fraud (0): 569,877 (96.50%)
+  Fraud (1):     20,663 (3.50%)
+
+Join verification:
+  Total transactions: 590,540
+  Transactions with identity: ~140,810
+  Identity coverage: ~23.84%
+
+--- Schemas present ---
+  raw (created)
+
+--- Tables in raw schema ---
+  transactions
+  identity
+
+SUCCESS: All RAW layer checks passed.
+  [✅] raw.transactions: 590,540 rows × 394 cols
+  [✅] raw.identity: 144,233 rows × 41 cols
+  [✅] Row counts match CSV source 100%
+  [✅] No null/duplicate TransactionID
+  [✅] All columns TEXT (RAW preserves original format)
+  [✅] Schema 'raw' exists and accessible

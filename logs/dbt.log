@@ -1,0 +1,121 @@
+[0m20:46:58.779347 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000172285682F0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001722595DBD0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001722AAF3C50>]}
+
+
+============================== 20:46:58.783680 | b3628472-fff3-4382-863f-84e914512820 ==============================
+[0m20:46:58.783680 [info ] [MainThread]: Running with dbt=1.12.1
+[0m20:46:58.784226 [debug] [MainThread]: running dbt with arguments {'version_check': 'True', 'no_print': 'None', 'static_parser': 'True', 'target_path': 'None', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'maximum_seed_size_mib': '1', 'printer_width': '80', 'write_json': 'True', 'introspect': 'True', 'log_cache_events': 'False', 'empty': 'None', 'cache_selected_only': 'False', 'fail_fast': 'False', 'debug': 'False', 'log_format': 'default', 'partial_parse': 'True', 'send_anonymous_usage_stats': 'True', 'quiet': 'False', 'warn_error': 'None', 'profiles_dir': 'C:\\Users\\Administrator\\.dbt', 'indirect_selection': 'eager', 'hints_enabled': 'True', 'invocation_command': 'dbt debug', 'use_experimental_parser': 'False', 'use_colors': 'True', 'log_path': 'logs'}
+[0m20:46:58.814995 [info ] [MainThread]: dbt version: 1.12.1
+[0m20:46:58.815513 [info ] [MainThread]: python version: 3.14.0
+[0m20:46:58.815823 [info ] [MainThread]: python path: C:\Python314\python.exe
+[0m20:46:58.816052 [info ] [MainThread]: os info: Windows-11-10.0.26100-SP0
+[0m20:46:58.816306 [info ] [MainThread]: Using profiles dir at C:\Users\Administrator\.dbt
+[0m20:46:58.816531 [info ] [MainThread]: Using profiles.yml file at C:\Users\Administrator\.dbt\profiles.yml
+[0m20:46:58.816743 [info ] [MainThread]: Using dbt_project.yml file at C:\Users\Administrator\Documents\ecommerce-fraud-dw\dbt_project.yml
+[0m20:46:58.816985 [info ] [MainThread]: Configuration:
+[0m20:46:58.817202 [info ] [MainThread]:   profiles.yml file [[31mERROR not found[0m]
+[0m20:46:58.817400 [info ] [MainThread]:   dbt_project.yml file [[31mERROR not found[0m]
+[0m20:46:58.817588 [info ] [MainThread]: Required dependencies:
+[0m20:46:58.817793 [debug] [MainThread]: Executing "git --help"
+[0m20:46:58.824450 [info ] [MainThread]:  - git [[31mERROR[0m]
+
+[0m20:46:58.824943 [info ] [MainThread]: Connection test skipped since no profile was found
+[0m20:46:58.825247 [info ] [MainThread]: [31m3 checks failed:[0m
+[0m20:46:58.825486 [info ] [MainThread]: dbt looked for a profiles.yml file in C:\Users\Administrator\.dbt\profiles.yml, but did
+not find one. For more information on configuring your profile, consult the
+documentation:
+
+https://docs.getdbt.com/docs/configure-your-profile
+
+
+[0m20:46:58.825724 [info ] [MainThread]: Project loading failed for the following reason:
+ project path <C:\Users\Administrator\Documents\ecommerce-fraud-dw\dbt_project.yml> not found
+
+[0m20:46:58.825938 [info ] [MainThread]: Error from git --help: Could not find command, ensure it is in the user's PATH and that the user has permissions to run it: "git"
+
+[0m20:46:58.826537 [debug] [MainThread]: Command `dbt debug` failed at 20:46:58.826441 after 0.19 seconds
+[0m20:46:58.826819 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001722A927490>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001722ABB04D0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001722AB267A0>]}
+[0m20:46:58.827084 [debug] [MainThread]: Flushing usage events
+[0m20:47:02.413620 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m20:47:10.510653 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001D3A4C582F0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001D3A2069BD0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001D3A71E3C50>]}
+
+
+============================== 20:47:10.514012 | 8aae1597-82a5-4813-a052-0d2265ecc4de ==============================
+[0m20:47:10.514012 [info ] [MainThread]: Running with dbt=1.12.1
+[0m20:47:10.514563 [debug] [MainThread]: running dbt with arguments {'version_check': 'True', 'no_print': 'None', 'static_parser': 'True', 'target_path': 'None', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'maximum_seed_size_mib': '1', 'printer_width': '80', 'write_json': 'True', 'empty': 'None', 'log_cache_events': 'False', 'introspect': 'True', 'cache_selected_only': 'False', 'log_format': 'default', 'debug': 'False', 'fail_fast': 'False', 'partial_parse': 'True', 'send_anonymous_usage_stats': 'True', 'quiet': 'False', 'warn_error': 'None', 'profiles_dir': 'C:\\Users\\Administrator\\.dbt', 'invocation_command': 'dbt deps', 'hints_enabled': 'True', 'indirect_selection': 'eager', 'use_experimental_parser': 'False', 'use_colors': 'True', 'log_path': 'logs'}
+[0m20:47:10.515457 [error] [MainThread]: [[31mERROR[0m]: Encountered an error:
+Runtime Error
+  No dbt_project.yml found at expected path C:\Users\Administrator\Documents\ecommerce-fraud-dw\dbt_project.yml
+  Verify that each entry within packages.yml (and their transitive dependencies) contains a file named dbt_project.yml
+  
+[0m20:47:10.516195 [debug] [MainThread]: Command `dbt deps` failed at 20:47:10.516098 after 0.14 seconds
+[0m20:47:10.516446 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001D3A70136F0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001D3A6FFFD10>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001D3A7216580>]}
+[0m20:47:10.516688 [debug] [MainThread]: Flushing usage events
+[0m20:47:11.851174 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m23:11:48.809647 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000022B482286E0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000022B45621A90>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000022B4A7C3B10>]}
+
+
+============================== 23:11:48.814026 | 14ba629f-a327-4288-b4c9-40793cc0a228 ==============================
+[0m23:11:48.814026 [info ] [MainThread]: Running with dbt=1.12.1
+[0m23:11:48.814761 [debug] [MainThread]: running dbt with arguments {'warn_error': 'None', 'printer_width': '80', 'hints_enabled': 'True', 'profiles_dir': 'C:\\Users\\Administrator\\.dbt', 'log_path': 'logs', 'log_format': 'default', 'static_parser': 'True', 'log_cache_events': 'False', 'no_print': 'None', 'target_path': 'None', 'quiet': 'False', 'introspect': 'True', 'empty': 'None', 'send_anonymous_usage_stats': 'True', 'version_check': 'True', 'use_experimental_parser': 'False', 'cache_selected_only': 'False', 'use_colors': 'True', 'partial_parse': 'True', 'debug': 'False', 'maximum_seed_size_mib': '1', 'indirect_selection': 'eager', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'write_json': 'True', 'invocation_command': 'dbt debug', 'fail_fast': 'False'}
+[0m23:11:48.841012 [info ] [MainThread]: dbt version: 1.12.1
+[0m23:11:48.841467 [info ] [MainThread]: python version: 3.14.0
+[0m23:11:48.841752 [info ] [MainThread]: python path: C:\Python314\python.exe
+[0m23:11:48.841991 [info ] [MainThread]: os info: Windows-11-10.0.26100-SP0
+[0m23:11:48.842418 [info ] [MainThread]: Using profiles dir at C:\Users\Administrator\.dbt
+[0m23:11:48.842714 [info ] [MainThread]: Using profiles.yml file at C:\Users\Administrator\.dbt\profiles.yml
+[0m23:11:48.843015 [info ] [MainThread]: Using dbt_project.yml file at C:\Users\Administrator\Documents\ecommerce-fraud-dw\dbt_project.yml
+[0m23:11:48.843322 [info ] [MainThread]: Configuration:
+[0m23:11:48.843590 [info ] [MainThread]:   profiles.yml file [[31mERROR not found[0m]
+[0m23:11:48.843835 [info ] [MainThread]:   dbt_project.yml file [[31mERROR not found[0m]
+[0m23:11:48.844047 [info ] [MainThread]: Required dependencies:
+[0m23:11:48.844279 [debug] [MainThread]: Executing "git --help"
+[0m23:11:48.851246 [info ] [MainThread]:  - git [[31mERROR[0m]
+
+[0m23:11:48.851641 [info ] [MainThread]: Connection test skipped since no profile was found
+[0m23:11:48.851923 [info ] [MainThread]: [31m3 checks failed:[0m
+[0m23:11:48.852158 [info ] [MainThread]: dbt looked for a profiles.yml file in C:\Users\Administrator\.dbt\profiles.yml, but did
+not find one. For more information on configuring your profile, consult the
+documentation:
+
+https://docs.getdbt.com/docs/configure-your-profile
+
+
+[0m23:11:48.852404 [info ] [MainThread]: Project loading failed for the following reason:
+ project path <C:\Users\Administrator\Documents\ecommerce-fraud-dw\dbt_project.yml> not found
+
+[0m23:11:48.852704 [info ] [MainThread]: Error from git --help: Could not find command, ensure it is in the user's PATH and that the user has permissions to run it: "git"
+
+[0m23:11:48.853350 [debug] [MainThread]: Command `dbt debug` failed at 23:11:48.853259 after 0.19 seconds
+[0m23:11:48.853601 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000022B4A5EF820>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000022B4A8743B0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000022B4A7EACF0>]}
+[0m23:11:48.853859 [debug] [MainThread]: Flushing usage events
+[0m23:11:50.419793 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m23:00:31.117193 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001D17ED986E0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001D17C195A90>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001D101433B10>]}
+
+
+============================== 23:00:31.122566 | f945e493-54eb-4998-a049-f166fd36ae87 ==============================
+[0m23:00:31.122566 [info ] [MainThread]: Running with dbt=1.12.1
+[0m23:00:31.123179 [debug] [MainThread]: running dbt with arguments {'warn_error': 'None', 'maximum_seed_size_mib': '1', 'printer_width': '80', 'profiles_dir': 'C:\\Users\\Administrator\\.dbt', 'log_path': 'logs', 'log_format': 'default', 'static_parser': 'True', 'log_cache_events': 'False', 'no_print': 'None', 'target_path': 'None', 'use_experimental_parser': 'False', 'introspect': 'True', 'send_anonymous_usage_stats': 'True', 'empty': 'False', 'version_check': 'True', 'quiet': 'False', 'cache_selected_only': 'False', 'hints_enabled': 'True', 'partial_parse': 'True', 'debug': 'False', 'use_colors': 'True', 'invocation_command': 'dbt build --select marts', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'write_json': 'True', 'indirect_selection': 'eager', 'fail_fast': 'False'}
+[0m23:00:31.123593 [error] [MainThread]: [[31mERROR[0m]: Encountered an error:
+Runtime Error
+  No dbt_project.yml found at expected path C:\Users\Administrator\Documents\ecommerce-fraud-dw\dbt_project.yml
+  Verify that each entry within packages.yml (and their transitive dependencies) contains a file named dbt_project.yml
+  
+[0m23:00:31.124343 [debug] [MainThread]: Command `dbt build` failed at 23:00:31.124236 after 0.27 seconds
+[0m23:00:31.124601 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001D1013C1480>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001D1013C79B0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001D1014BC050>]}
+[0m23:00:31.124898 [debug] [MainThread]: Flushing usage events
+[0m23:00:32.539798 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m23:01:23.427721 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001F6B85986E0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001F6B5995A90>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001F6BAB83B10>]}
+
+
+============================== 23:01:23.433534 | b7a4e6fd-a3aa-48a8-b4a6-3979025b99c8 ==============================
+[0m23:01:23.433534 [info ] [MainThread]: Running with dbt=1.12.1
+[0m23:01:23.434274 [debug] [MainThread]: running dbt with arguments {'warn_error': 'None', 'printer_width': '80', 'maximum_seed_size_mib': '1', 'log_path': 'logs', 'profiles_dir': 'C:\\Users\\Administrator\\.dbt', 'log_format': 'default', 'static_parser': 'True', 'log_cache_events': 'False', 'no_print': 'None', 'target_path': 'None', 'quiet': 'False', 'introspect': 'True', 'empty': 'False', 'send_anonymous_usage_stats': 'True', 'version_check': 'True', 'use_experimental_parser': 'False', 'cache_selected_only': 'False', 'hints_enabled': 'True', 'partial_parse': 'True', 'debug': 'False', 'use_colors': 'True', 'indirect_selection': 'eager', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'write_json': 'True', 'invocation_command': 'dbt build --select marts', 'fail_fast': 'False'}
+[0m23:01:23.434656 [error] [MainThread]: [[31mERROR[0m]: Encountered an error:
+Runtime Error
+  No dbt_project.yml found at expected path C:\Users\Administrator\Documents\ecommerce-fraud-dw\dbt_project.yml
+  Verify that each entry within packages.yml (and their transitive dependencies) contains a file named dbt_project.yml
+  
+[0m23:01:23.435482 [debug] [MainThread]: Command `dbt build` failed at 23:01:23.435387 after 0.16 seconds
+[0m23:01:23.435735 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001F6BAB0D480>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001F6BAB179B0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001F6BAC0C050>]}
+[0m23:01:23.435976 [debug] [MainThread]: Flushing usage events
+[0m23:01:25.014229 [debug] [MainThread]: An error was encountered while trying to flush usage events

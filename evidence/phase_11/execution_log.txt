@@ -1,0 +1,66 @@
+PHASE 11 — STAGING Layer
+========================
+
+Date: 2026-09-02
+Status: COMPLETED
+Tools: dbt-core 1.8.0, dbt-postgres 1.8.0, Python 3.14.0
+
+EXECUTION LOG
+-------------
+Command: dbt run --select staging.* --full-refresh
+Working dir: dbt/
+
+Output:
+  Running with dbt=1.8.0
+  Found 2 models, 1 operation, 2 sources, 429 macros
+  Concurrency: 4 threads (target='dev')
+  
+  1 of 2 START sql view model staging.stg_identity ....................... [RUN]
+  2 of 2 START sql view model staging.stg_transactions ..................... [RUN]
+  1 of 2 OK created sql view model staging.stg_identity .................... [CREATE VIEW in 0.12s]
+  2 of 2 OK created sql view model staging.stg_transactions .................. [CREATE VIEW in 0.13s]
+  
+  Finished running 2 view models, 1 project hook in 0 hrs 0 min 0.29 sec
+  Completed successfully: PASS=2 WARN=0 ERROR=0 SKIP=0 TOTAL=2
+
+
+VERIFICATION RESULTS
+--------------------
+Python script connected to PostgreSQL and verified:
+
+stg_transactions:
+  - Row count: 590,540 ✅ (matches RAW layer)
+  - Sample columns: transaction_id (bigint), is_fraud (smallint), 
+                   transaction_amt (numeric), product_cd (varchar), 
+                   card1 (integer)
+  - Sample data: [(3561737, 0, 49.50, 'W'), (3561738, 0, 43.04, 'C'), ...]
+
+stg_identity:
+  - Row count: 144,233 ✅ (matches RAW layer)
+  - Sample columns: transaction_id (bigint), id_01 (double precision), 
+                   id_02 (double precision), ...
+  - Data types: Properly cast from TEXT to native PostgreSQL types
+
+
+ISSUES ENCOUNTERED
+------------------
+1. PostgreSQL schema concatenation: dbt's default `default__generate_schema_name` 
+   macro concatenates target schema with custom schema (e.g., "raw" + "staging" = "raw_staging").
+   Solution: Created macros/schema_override.sql to override the macro and use 
+   custom schema name directly.
+
+2. protobuf compatibility: dbt 1.8.0 installed with protobuf 4.25.x which is 
+   incompatible with Python 3.14 (TypeError: Metaclasses with custom tp_new 
+   are not supported). Fixed by upgrading protobuf to 7.36.1.
+
+
+FILES CREATED
+-------------
+- dbt/dbt_project.yml
+- dbt/profiles.yml
+- dbt/macros/schema_override.sql
+- dbt/models/src/raw_sources.yml
+- dbt/models/staging/stg_transactions.sql
+- dbt/models/staging/stg_identity.sql
+- docs/11_staging/staging_layer.md
+- evidence/phase_11/execution_log.txt (this file)

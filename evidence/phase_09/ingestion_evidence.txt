@@ -1,0 +1,55 @@
+PHASE 09 — DATA INGESTION
+==========================
+Status: ✅ PASSED
+Date: 02/09/2026
+Evidence: terminal_output.txt, test_results.txt
+
+--- Terminal Output ---
+2026-09-02 13:07:01,678 [INFO] === BAT DAU QUY TRINH DATA INGESTION (RAW LAYER) ===
+2026-09-02 13:07:01,746 [INFO] Ket noi toi PostgreSQL thanh cong!
+2026-09-02 13:07:01,746 [INFO] Dang kiem tra/khoi tao schema 'raw'...
+2026-09-02 13:07:01,749 [INFO] Schema 'raw' da san sang.
+2026-09-02 13:07:03,091 [INFO] Xac nhan file train_transaction.csv:
+2026-09-02 13:07:03,091 [INFO]   File size: 652.3 MB
+2026-09-02 13:07:03,091 [INFO]   Columns: 394
+2026-09-02 13:07:03,091 [INFO]   Rows (excl header): 590,540
+2026-09-02 13:07:03,120 [INFO] Tao bang raw.transactions voi 394 cot
+2026-09-02 13:07:03,167 [INFO] Da tao bang raw.transactions
+2026-09-02 13:07:03,168 [INFO] Bat dau nap file train_transaction.csv vao bang raw.transactions...
+2026-09-02 13:07:13,873 [INFO] Hoan thanh nap 590,540 ban ghi trong 10.78 giay.
+2026-09-02 13:07:14,094 [INFO] Row count verified: 590,540 == 590,540
+2026-09-02 13:07:14,166 [INFO] Xac nhan file train_identity.csv:
+2026-09-02 13:07:14,166 [INFO]   File size: 25.4 MB
+2026-09-02 13:07:14,166 [INFO]   Columns: 41
+2026-09-02 13:07:14,166 [INFO]   Rows (excl header): 144,233
+2026-09-02 13:07:14,173 [INFO] Tao bang raw.identity voi 41 cot
+2026-09-02 13:07:14,182 [INFO] Da tao bang raw.identity
+2026-09-02 13:07:14,182 [INFO] Bat dau nap file train_identity.csv vao bang raw.identity...
+2026-09-02 13:07:14,648 [INFO] Hoan thanh nap 144,233 ban ghi trong 0.48 giay.
+2026-09-02 13:07:14,667 [INFO] Row count verified: 144,233 == 144,233
+2026-09-02 13:07:14,668 [INFO] === KIEM TRA SO LUONG BAN GHI TAI RAW LAYER ===
+2026-09-02 13:07:14,808 [INFO] -> raw.transactions: 590,540 ban ghi (expected: 590,540)
+2026-09-02 13:07:14,808 [INFO] -> raw.identity:     144,233 ban ghi (expected: 144,233)
+2026-09-02 13:07:14,808 [INFO] All row counts verified!
+2026-09-02 13:07:14,809 [INFO] === QUY TRINH INGESTION HOAN THANH THANH CONG ===
+
+--- Test Results ---
+12 passed in 17.08s
+  TestCSVFiles::test_transaction_csv_exists PASSED
+  TestCSVFiles::test_identity_csv_exists PASSED
+  TestDatabaseConnection::test_engine_connection PASSED
+  TestRawSchema::test_raw_schema_exists PASSED
+  TestRawSchema::test_transactions_table_exists PASSED
+  TestRawSchema::test_identity_table_exists PASSED
+  TestRowCount::test_transactions_row_count PASSED
+  TestRowCount::test_identity_row_count PASSED
+  TestDataIntegrity::test_transaction_id_not_null PASSED
+  TestDataIntegrity::test_transaction_id_unique PASSED
+  TestSchemaConsistency::test_transactions_column_count PASSED
+  TestSchemaConsistency::test_identity_column_count PASSED
+
+--- Issue Log ---
+ISSUE-001: Local PostgreSQL (PID 8024) cung cập port 5432 cùng với Docker container
+  Root cause: Đã cài PostgreSQL local trên Windows, conflict với Docker port mapping
+  Fix: Dung taskkill de dung process local PostgreSQL (PID 8024)
+  Prevention: Document port conflict trong troubleshooting.md

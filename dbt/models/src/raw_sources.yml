@@ -1,0 +1,69 @@
+version: 2
+
+sources:
+
+  - name: raw
+
+    database: ecommerce_fraud_dw
+
+    schema: raw
+
+    description: >
+      RAW layer containing data ingested directly from the
+      IEEE-CIS Fraud Detection dataset. RAW data is preserved
+      as the source-of-truth layer and is not transformed.
+
+    tables:
+
+      - name: transactions
+
+        description: >
+          RAW transaction-level data from the IEEE-CIS Fraud Detection
+          dataset. Contains transaction attributes, card information,
+          email information, counting features, time-delta features,
+          match features and Vesta features.
+
+        columns:
+
+          - name: TransactionID
+            description: >
+              Source transaction identifier.
+
+          - name: isFraud
+            description: >
+              Fraud label from the source dataset. Expected values are 0 or 1.
+
+          - name: TransactionDT
+            description: >
+              Time delta value representing the transaction timestamp
+              relative to the reference time defined by the source dataset.
+
+          - name: TransactionAmt
+            description: >
+              Transaction amount in USD.
+
+          - name: ProductCD
+            description: >
+              Product code associated with the transaction.
+
+      - name: identity
+
+        description: >
+          RAW identity-level data from the IEEE-CIS Fraud Detection
+          dataset. Contains device, browser and identity-related
+          attributes associated with transactions.
+
+        columns:
+
+          - name: TransactionID
+            description: >
+              Source transaction identifier used to associate identity
+              information with transaction records.
+
+          - name: DeviceType
+            description: >
+              Device type reported by the source dataset.
+
+          - name: DeviceInfo
+            description: >
+              Device information reported by the source dataset.

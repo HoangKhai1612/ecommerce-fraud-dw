@@ -1,0 +1,36 @@
+name: ecommerce_fraud_dw
+
+version: "1.0"
+
+config-version: 2
+
+profile: ecommerce_fraud_dw
+
+model-paths:
+  - models
+
+macro-paths:
+  - macros
+
+test-paths:
+  - tests
+
+target-path: target
+
+clean-targets:
+  - target
+  - dbt_packages
+
+models:
+  ecommerce_fraud_dw:
+
+    staging:
+      +schema: staging
+      +materialized: view
+
+    marts:
+      +schema: marts
+      +materialized: table
+
+on-run-start:
+  - "SELECT 1"

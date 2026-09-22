@@ -1,0 +1,111 @@
+version: 2
+
+models:
+
+  - name: stg_transactions
+
+    description: >
+      Staging representation of the RAW transactions table.
+      The model standardizes column names, converts source TEXT
+      values into appropriate PostgreSQL data types and provides
+      an audit timestamp. No business filtering or aggregation
+      is performed at this layer.
+
+    columns:
+
+      - name: transaction_id
+
+        description: >
+          Source transaction identifier. Acts as the natural/business
+          key of the transaction in the source system.
+
+        data_tests:
+          - not_null
+          - unique
+
+
+      - name: is_fraud
+
+        description: >
+          Fraud label from the source dataset.
+          0 represents a non-fraudulent transaction and
+          1 represents a fraudulent transaction.
+
+        data_tests:
+          - not_null
+          - accepted_values:
+              values: [0, 1]
+
+      - name: transaction_dt
+
+        description: >
+          Transaction time-delta value from the IEEE-CIS dataset.
+
+
+      - name: transaction_amt
+
+        description: >
+          Transaction amount in USD.
+
+        data_tests:
+          - not_null
+
+
+      - name: product_cd
+
+        description: >
+          Product code associated with the transaction.
+
+        data_tests:
+          - not_null
+
+
+      - name: _loaded_at
+
+        description: >
+          Timestamp associated with evaluation/building of the staging
+          relation. Because this model is currently materialized as a
+          view, this timestamp should not be interpreted as the physical
+          ingestion time of the source record.
+
+  - name: stg_identity
+
+    description: >
+      Staging representation of the RAW identity table.
+      The model standardizes column names and converts source
+      values into appropriate PostgreSQL data types while
+      preserving mixed-type identity attributes as text.
+
+    columns:
+
+      - name: transaction_id
+
+        description: >
+          Transaction identifier used to associate identity records
+          with the corresponding transaction.
+
+        data_tests:
+          - not_null
+
+          - relationships:
+              to: ref('stg_transactions')
+              field: transaction_id
+
+
+      - name: device_type
+
+        description: >
+          Device type reported by the source dataset.
+
+
+      - name: device_info
+
+        description: >
+          Device information reported by the source dataset.
+
+
+      - name: _loaded_at
+
+        description: >
+          Timestamp associated with evaluation/building of the staging
+          relation.

@@ -1,0 +1,14 @@
+# Kết nối đến Postgres
+ecommerce_fraud_dw:
+  target: dev
+  
+  output: 
+    dev:
+      type: postgres
+      host: localhost
+      user: ${POSTGRES_USER}
+      password: ${POSTGRES_PASSWORD}
+      port: 5432
+      dbname: ${POSTGRES_DB}
+      schema: mart
+      threads: 4
