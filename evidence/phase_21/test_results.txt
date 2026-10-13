@@ -1,0 +1,39 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.14.0, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\Administrator\Documents\ecommerce-fraud-dw\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\Administrator\Documents\ecommerce-fraud-dw
+plugins: anyio-4.15.1, cov-7.1.0
+collecting ... collected 20 items
+
+api/tests/test_health.py::test_root PASSED                               [  5%]
+api/tests/test_health.py::test_health PASSED                             [ 10%]
+api/tests/test_health.py::test_ready PASSED                              [ 15%]
+api/tests/test_health.py::test_openapi PASSED                            [ 20%]
+api/tests/test_predict.py::test_predict_valid_request PASSED             [ 25%]
+api/tests/test_predict.py::test_predict_low_risk PASSED                  [ 30%]
+api/tests/test_predict.py::test_predict_medium_risk PASSED               [ 35%]
+api/tests/test_predict.py::test_predict_missing_required_fields PASSED   [ 40%]
+api/tests/test_predict.py::test_predict_invalid_types PASSED             [ 45%]
+api/tests/test_predict.py::test_predict_negative_transaction_id PASSED   [ 50%]
+api/tests/test_predict.py::test_predict_zero_amount PASSED               [ 55%]
+api/tests/test_predict.py::test_predict_model_not_loaded PASSED          [ 60%]
+api/tests/test_predict.py::test_predict_inference_error PASSED           [ 65%]
+api/tests/test_predict.py::test_predict_extra_fields_allowed PASSED      [ 70%]
+api/tests/test_transactions.py::test_get_transaction_found PASSED        [ 75%]
+api/tests/test_transactions.py::test_get_transaction_not_found PASSED    [ 80%]
+api/tests/test_transactions.py::test_get_transaction_invalid_id PASSED   [ 85%]
+api/tests/test_transactions.py::test_get_top_predictions_default PASSED  [ 90%]
+api/tests/test_transactions.py::test_get_top_predictions_custom_limit PASSED [ 95%]
+api/tests/test_transactions.py::test_get_top_predictions_invalid_limit PASSED [100%]
+
+============================== warnings summary ===============================
+.venv\Lib\site-packages\fastapi\testclient.py:1
+  C:\Users\Administrator\Documents\ecommerce-fraud-dw\.venv\Lib\site-packages\fastapi\testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+.venv\Lib\site-packages\starlette\testclient.py:53
+  C:\Users\Administrator\Documents\ecommerce-fraud-dw\.venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================= 20 passed, 2 warnings in 1.12s ========================

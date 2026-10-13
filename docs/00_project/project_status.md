@@ -20,9 +20,9 @@ PHASE 08  ██████████  100% PASSED      — Data Modeling
 PHASE 09  ██████████  100% PASSED✅     — Data Ingestion (COPY, 10.78s, 12 tests pass)
 PHASE 10  ██████████  100% PASSED✅     — RAW Layer (590,540+144,233 rows)
 PHASE 11  ██████████  100% PASSED✅     — STAGING Layer (dbt views, staging schema)
-PHASE 12  ██████████  100% DOCS       — dbt Star Schema (docs complete, code pending)
-PHASE 13  ██████████  100% DOCS       — Airflow DAG (docs complete, code pending)
-PHASE 14  ██████████  100% DOCS       — Data Quality (docs complete, code pending)
+PHASE 12  ██████████  100% PASSED✅     — dbt Star Schema (code + docs)
+PHASE 13  ██████████  100% PASSED✅     — Airflow DAG (code + docs)
+PHASE 14  ██████████  100% PASSED✅     — Data Quality (code + docs)
 PHASE 15  ██████████  100% DOCS       — Fraud Detection Prep (docs complete, code pending)
 PHASE 16  ██████████  100% DOCS       — Machine Learning (docs complete, code pending)
 PHASE 17  ██████████  100% DOCS       — Model Evaluation (docs complete, code pending)
@@ -70,7 +70,7 @@ PHASE 30  ██████████  100% DOCS       — Extension (docs co
 - [x] docs/11_staging/staging_layer.md — FULL CODE
 - [x] docs/12_dbt_models/dbt_models.md — FULL CODE
 - [x] docs/13_airflow/airflow_dag.md — FULL CODE
-- [x] docs/14_data_quality/data_quality.md
+- [x] docs/14_data_quality/data_quality.md — FULL CODE
 - [x] docs/15_fraud_detection/fraud_detection_prep.md — FULL CODE
 - [x] docs/16_machine_learning/machine_learning.md — FULL CODE
 - [x] docs/17_model_evaluation/model_evaluation.md — FULL CODE

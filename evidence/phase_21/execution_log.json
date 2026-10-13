@@ -1,0 +1,33 @@
+﻿{
+  "phase": 21,
+  "status": "COMPLETED AND VERIFIED",
+  "api_endpoints_tested": [
+    {"endpoint": "/health", "method": "GET", "status": 200, "response": {"status": "ok", "service": "fraud-detection-api"}},
+    {"endpoint": "/ready", "method": "GET", "status": 200, "response": {"status": "ready", "database": "ok"}},
+    {"endpoint": "/docs", "method": "GET", "status": 200, "note": "Swagger UI accessible"},
+    {"endpoint": "/openapi.json", "method": "GET", "status": 200, "note": "OpenAPI schema accessible"},
+    {"endpoint": "/transactions/3405150", "method": "GET", "status": 200, "response": {"transaction_id": 3405150, "is_fraud": 0, "transaction_amt": 309.95, "product_cd": "W", "transaction_dt": 10558948}},
+    {"endpoint": "/predict", "method": "POST", "status": 200, "input": {"transaction_id": 12345, "transaction_dt": 86400, "transaction_amt": 150.75, "product_cd": "W", "card1": 1001, "card4": "visa", "device_type": "mobile"}, "response": {"transaction_id": 12345, "is_fraud": 0, "fraud_probability": 0.2585025727748871, "risk_level": "low", "model_version": "xgboost-v1-phase16"}},
+    {"endpoint": "/predict", "method": "POST", "status": 200, "input": {"transaction_id": 3405208, "note": "Known fraud transaction from DB"}, "response": {"transaction_id": 3405208, "is_fraud": 1, "fraud_probability": 0.9878, "risk_level": "high", "model_version": "xgboost-v1-phase16"}},
+    {"endpoint": "/transactions/predictions/top?limit=5", "method": "GET", "status": 200, "note": "Returns 5 rows, top: transaction_id=3122167, fraud_probability=0.9982318, matches Phase 19 verification"}
+  ],
+  "test_results": "20 passed, 0 failed, 0 skipped",
+  "test_breakdown": {
+    "test_health.py": 4,
+    "test_predict.py": 10,
+    "test_transactions.py": 6
+  },
+  "artifacts_used": {
+    "model": "ml/models/xgboost.pkl (XGBClassifier)",
+    "feature_columns": "ml/models/feature_columns.json (1014 features)",
+    "frequency_encoder": "ml/models/frequency_encoder.pkl",
+    "preprocessor": "ml/models/preprocessor.pkl"
+  },
+  "model_metrics_reference": {
+    "phase_16_roc_auc": 0.917,
+    "phase_17_test_roc_auc": 0.917245,
+    "phase_19_test_roc_auc": 0.917245,
+    "phase_17_threshold_0.5_precision": 0.3196,
+    "phase_17_threshold_0.5_recall": 0.7099
+  }
+}

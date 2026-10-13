@@ -1,0 +1,227 @@
+{
+  "description": "50 giao d\u1ecbch c\u00f3 x\u00e1c su\u1ea5t gian l\u1eadn cao nh\u1ea5t t\u1eeb marts.predictions (model_version='xgboost-v1-phase16'). \u0110\u00e2y l\u00e0 d\u1ef1 \u0111o\u00e1n c\u1ee7a m\u00f4 h\u00ecnh, kh\u00f4ng ph\u1ea3i k\u1ebft lu\u1eadn \u0111i\u1ec1u tra.",
+  "archived": false,
+  "collection_position": null,
+  "table_id": null,
+  "result_metadata": [
+    {
+      "display_name": "transaction_id",
+      "field_ref": [
+        "field",
+        "transaction_id",
+        {
+          "base-type": "type/BigInteger"
+        }
+      ],
+      "name": "transaction_id",
+      "base_type": "type/BigInteger",
+      "effective_type": "type/BigInteger",
+      "semantic_type": null,
+      "fingerprint": {
+        "global": {
+          "distinct-count": 50,
+          "nil%": 0.0
+        },
+        "type": {
+          "type/Number": {
+            "min": 3001787.0,
+            "q1": 3184423.0,
+            "q3": 3459909.0,
+            "max": 3570932.0,
+            "sd": 167639.6578969478,
+            "avg": 3304189.52
+          }
+        }
+      }
+    },
+    {
+      "display_name": "is_fraud_actual",
+      "field_ref": [
+        "field",
+        "is_fraud_actual",
+        {
+          "base-type": "type/Integer"
+        }
+      ],
+      "name": "is_fraud_actual",
+      "base_type": "type/Integer",
+      "effective_type": "type/Integer",
+      "semantic_type": null,
+      "fingerprint": {
+        "global": {
+          "distinct-count": 1,
+          "nil%": 0.0
+        },
+        "type": {
+          "type/Number": {
+            "min": 1.0,
+            "q1": 1.0,
+            "q3": 1.0,
+            "max": 1.0,
+            "sd": 0.0,
+            "avg": 1.0
+          }
+        }
+      }
+    },
+    {
+      "display_name": "is_fraud_predicted",
+      "field_ref": [
+        "field",
+        "is_fraud_predicted",
+        {
+          "base-type": "type/Integer"
+        }
+      ],
+      "name": "is_fraud_predicted",
+      "base_type": "type/Integer",
+      "effective_type": "type/Integer",
+      "semantic_type": null,
+      "fingerprint": {
+        "global": {
+          "distinct-count": 1,
+          "nil%": 0.0
+        },
+        "type": {
+          "type/Number": {
+            "min": 1.0,
+            "q1": 1.0,
+            "q3": 1.0,
+            "max": 1.0,
+            "sd": 0.0,
+            "avg": 1.0
+          }
+        }
+      }
+    },
+    {
+      "display_name": "fraud_probability_pct",
+      "field_ref": [
+        "field",
+        "fraud_probability_pct",
+        {
+          "base-type": "type/Decimal"
+        }
+      ],
+      "name": "fraud_probability_pct",
+      "base_type": "type/Decimal",
+      "effective_type": "type/Decimal",
+      "semantic_type": null,
+      "fingerprint": {
+        "global": {
+          "distinct-count": 20,
+          "nil%": 0.0
+        },
+        "type": {
+          "type/Number": {
+            "min": 99.47,
+            "q1": 99.51,
+            "q3": 99.64,
+            "max": 99.82,
+            "sd": 0.08087001411940906,
+            "avg": 99.5822
+          }
+        }
+      }
+    },
+    {
+      "display_name": "transaction_amt",
+      "field_ref": [
+        "field",
+        "transaction_amt",
+        {
+          "base-type": "type/Decimal"
+        }
+      ],
+      "name": "transaction_amt",
+      "base_type": "type/Decimal",
+      "effective_type": "type/Decimal",
+      "semantic_type": null,
+      "fingerprint": {
+        "global": {
+          "distinct-count": 38,
+          "nil%": 0.0
+        },
+        "type": {
+          "type/Number": {
+            "min": 10.39,
+            "q1": 30.95,
+            "q3": 156.5741454089335,
+            "max": 2259.95,
+            "sd": 323.3363513085886,
+            "avg": 148.908
+          }
+        }
+      }
+    }
+  ],
+  "creator": {
+    "email": "admin@frauddw.local",
+    "first_name": "Fraud",
+    "last_login": "2026-10-09T15:54:38.111671Z",
+    "is_qbnewb": true,
+    "is_superuser": true,
+    "id": 1,
+    "last_name": "DW Admin",
+    "date_joined": "2026-10-09T15:25:47.078083Z",
+    "common_name": "Fraud DW Admin"
+  },
+  "initially_published_at": null,
+  "can_write": true,
+  "database_id": 2,
+  "enable_embedding": false,
+  "collection_id": 2,
+  "query_type": "native",
+  "name": "Top 50 d\u1ef1 \u0111o\u00e1n gian l\u1eadn",
+  "last_query_start": "2026-10-09T15:48:32.491793Z",
+  "dashboard_count": 1,
+  "type": "question",
+  "average_query_time": 382.0,
+  "creator_id": 1,
+  "moderation_reviews": [],
+  "updated_at": "2026-10-09T15:48:32.865422Z",
+  "made_public_by_id": null,
+  "embedding_params": null,
+  "cache_ttl": null,
+  "dataset_query": {
+    "type": "native",
+    "database": 2,
+    "native": {
+      "query": "SELECT p.transaction_id, p.is_fraud_actual, p.is_fraud_predicted, ROUND((p.fraud_probability * 100)::numeric, 2) AS fraud_probability_pct, f.transaction_amt FROM marts.predictions p JOIN marts.fact_transactions f ON f.transaction_id = p.transaction_id WHERE p.model_version = 'xgboost-v1-phase16' ORDER BY p.fraud_probability DESC LIMIT 50;"
+    }
+  },
+  "id": 8,
+  "parameter_mappings": [],
+  "display": "table",
+  "entity_id": "KlXscqZLAAwawOiyNgb4b",
+  "collection_preview": true,
+  "last-edit-info": {
+    "id": 1,
+    "email": "admin@frauddw.local",
+    "first_name": "Fraud",
+    "last_name": "DW Admin",
+    "timestamp": "2026-10-09T15:48:29.031796Z"
+  },
+  "visualization_settings": {},
+  "collection": {
+    "authority_level": null,
+    "description": "Fraud analytics questions (Phase 20)",
+    "archived": false,
+    "slug": "fraud_analytics",
+    "name": "Fraud Analytics",
+    "personal_owner_id": null,
+    "type": null,
+    "id": 2,
+    "entity_id": "t9j8G5mnrAt5E685CATtX",
+    "location": "/",
+    "namespace": null,
+    "is_personal": false,
+    "created_at": "2026-10-09T15:36:24.136134Z"
+  },
+  "metabase_version": "v0.49.0 (46c668b)",
+  "parameters": [],
+  "dataset": false,
+  "created_at": "2026-10-09T15:39:31.702767Z",
+  "parameter_usage_count": 0,
+  "public_uuid": null
+}

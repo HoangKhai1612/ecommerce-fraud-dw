@@ -842,7 +842,33 @@ def verify_raw_tables(
     )
 
 
-# 17. FILE SIZE INFORMATION
+# 17. RAW DATA EXISTENCE CHECK
+
+def check_raw_data_exists(
+    engine: Engine,
+    schema: str,
+    table_name: str
+) -> bool:
+    """
+    Check if raw table already contains data.
+    Used for idempotent ingestion.
+    """
+
+    query = text(
+        f'SELECT COUNT(*) '
+        f'FROM "{schema}"."{table_name}"'
+    )
+
+    with engine.connect() as conn:
+
+        count = conn.execute(query).scalar_one()
+
+    return count > 0
+
+
+# 18. FILE SIZE INFORMATION
+
+# NOTE: Renumbered from original #17 to accommodate new check function
 
 def log_dataset_information(
     csv_path: Path
@@ -994,6 +1020,36 @@ def main() -> None:
             logger.info(
                 "-" * 70
             )
+
+            # Check if data already exists (idempotent ingestion)
+            if check_raw_data_exists(
+                engine=engine,
+                schema=schema,
+                table_name=table_name
+            ):
+                logger.info(
+                    f"✓ {schema}.{table_name} đã có dữ liệu - bỏ qua load CSV."
+                )
+
+                # Still verify row count
+                actual = verify_row_count(
+                    engine=engine,
+                    schema=schema,
+                    table_name=table_name,
+                    expected_rows=expected_rows
+                )
+
+                if actual != expected_rows:
+                    logger.error(
+                        f"✗ {schema}.{table_name}: "
+                        f"Row count mismatch: {actual} != {expected_rows}"
+                    )
+                    raise ValueError(
+                        f"Data count mismatch for {schema}.{table_name}: "
+                        f"{actual} != {expected_rows}"
+                    )
+
+                continue
 
             # Check file
             if not csv_path.exists():

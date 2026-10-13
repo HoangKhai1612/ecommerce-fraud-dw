@@ -1,0 +1,75 @@
+﻿PHASE 20 - METABASE DASHBOARD - EXECUTION LOG
+Date: 2026-10-09 (UTC+7)
+Environment: Windows 11, Docker Desktop, Python 3.14.0 (.venv)
+
+=== STEP 1: Pre-checks ===
+- docker compose ps: fraud_dw_postgres Up (healthy), fraud_dw_airflow Up,
+  fraud_dw_api Restarting (pre-existing uicorn permission issue, out of scope)
+- Port 3000: free before deployment
+- Connectivity from Docker network to Windows PostgreSQL:
+  docker run --rm -e PGPASSWORD=... postgres:15-alpine
+    psql -h host.docker.internal -p 5432 -U postgres -d postgres
+  => connectivity-ok | 127.0.0.1
+- DW baseline (psql direct): 590,540 transactions | 20,663 fraud |
+  3.4990% | SUM(transaction_amt) = 79,738,980.37
+
+=== STEP 2: Database metadata + read-only role ===
+.\metabase\init_database.ps1
+=> Created role metabase_ro
+=> Database metabase_db already exists (unchanged)
+=> Granted CONNECT/USAGE/SELECT to metabase_ro on marts
+=> metabase_ro read-only login verified (marts.predictions rows: 88581)
+
+=== STEP 3: Docker Compose ===
+- docker-compose.yml: added metabase service (metabase/metabase:v0.49.0,
+  MB_DB_DBNAME=metabase_db, MB_DB_HOST=host.docker.internal, port 3000,
+  extra_hosts host-gateway, depends_on postgres service_healthy)
+- docker compose config => valid
+- docker compose up -d metabase => image pulled (v0.49.0, 2024-03-14),
+  container created and started
+- Logs: "Metabase Initialization COMPLETE in 48.6 s"
+- GET http://localhost:3000 => HTTP 200
+
+=== STEP 4: API automation ===
+="utf-8"; .venv\Scripts\python.exe metabase\setup_metabase.py
+=> Logged in as existing admin
+=> Database 'ecommerce_fraud_dw' already configured (id=2)
+=> metadata ready: marts tables visible: dim_date, dim_device,
+   dim_product, fact_transactions, predictions
+=> Collection 'Fraud Analytics' (id=2)
+=> Cards created (ids 1-8): 4 KPI scalars, fraud trend (line),
+   fraud by device (bar), fraud by product (bar), top 50 predictions (table)
+=> Dashboard 'E-commerce Fraud Analytics' (id=1), moved to collection 2,
+   8 cards attached on 12-column grid
+
+=== STEP 5: Verification (queries executed THROUGH Metabase's connection) ===
+POST /api/card/:id/query => HTTP 202 with result payload
+- total_transactions       -> 590540
+- total_fraud_transactions -> 20663
+- fraud_rate_pct           -> 3.5 (3.4990% before rounding)
+- total_amount             -> 79738980.37
+- fraud_trend_by_day       -> 182 rows (1970-01-02 .. 1970-07-02)
+- fraud_by_device          -> 3 rows: mobile 10.17%, desktop 6.52%, Unknown 2.10%
+- fraud_by_product         -> 5 rows: C 11.69%, S 5.90%, H 4.77%, R 3.78%, W 2.04%
+- top_fraud_predictions    -> 50 rows, 99.82% .. 99.47%, top: 3122167
+All values cross-checked against direct psql queries: MATCH.
+
+=== STEP 6: Persistence ===
+docker restart fraud_dw_metabase => Up, GET http://localhost:3000 => HTTP 200
+GET /api/dashboard/1 => name 'E-commerce Fraud Analytics', collection_id=2,
+dashcards=8 (layout intact: KPIs row 0, trend row 2, device/product row 7,
+predictions row 12)
+
+=== Errors found and fixed (see doc section 8 for details) ===
+1. GET /api/setup removed in v0.49 -> token from /api/session/properties
+2. Setup payload: site_name/email/password validated at top-level (source:
+   src/metabase/api/setup.clj) + nested user/prefs
+3. First failed setup left stale token + no user -> completed with stored
+   token from metabase_db.setting
+4. List endpoints paginated {"data":[...]} in v0.49
+5. POST /:id/sync -> /:id/sync_schema in v0.49; metadata tables at top level
+6. POST /:id/cards removed -> PUT /:id/cards with card_id + negative temp ids
+7. Dashboard create/update uses collection_id key
+8. Card query returns 202 Accepted
+9. round(double precision, integer) does not exist in PostgreSQL -> ::numeric cast
+10. Windows console cp1252 -> UTF-8 reconfigure

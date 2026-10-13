@@ -1,0 +1,1 @@
+﻿{"transaction_id":12345,"is_fraud":0,"fraud_probability":0.2585025727748871,"risk_level":"low","message":"Transaction appears legitimate","model_version":"xgboost-v1-phase16"}

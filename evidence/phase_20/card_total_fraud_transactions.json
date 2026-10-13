@@ -1,0 +1,107 @@
+{
+  "description": "KPI: s\u1ed1 giao d\u1ecbch c\u00f3 nh\u00e3n th\u1ef1c t\u1ebf is_fraud = 1",
+  "archived": false,
+  "collection_position": null,
+  "table_id": null,
+  "result_metadata": [
+    {
+      "display_name": "total_fraud_transactions",
+      "field_ref": [
+        "field",
+        "total_fraud_transactions",
+        {
+          "base-type": "type/BigInteger"
+        }
+      ],
+      "name": "total_fraud_transactions",
+      "base_type": "type/BigInteger",
+      "effective_type": "type/BigInteger",
+      "semantic_type": null,
+      "fingerprint": {
+        "global": {
+          "distinct-count": 1,
+          "nil%": 0.0
+        },
+        "type": {
+          "type/Number": {
+            "min": 20663.0,
+            "q1": 20663.0,
+            "q3": 20663.0,
+            "max": 20663.0,
+            "sd": null,
+            "avg": 20663.0
+          }
+        }
+      }
+    }
+  ],
+  "creator": {
+    "email": "admin@frauddw.local",
+    "first_name": "Fraud",
+    "last_login": "2026-10-09T15:54:38.111671Z",
+    "is_qbnewb": true,
+    "is_superuser": true,
+    "id": 1,
+    "last_name": "DW Admin",
+    "date_joined": "2026-10-09T15:25:47.078083Z",
+    "common_name": "Fraud DW Admin"
+  },
+  "initially_published_at": null,
+  "can_write": true,
+  "database_id": 2,
+  "enable_embedding": false,
+  "collection_id": 2,
+  "query_type": "native",
+  "name": "T\u1ed5ng s\u1ed1 giao d\u1ecbch gian l\u1eadn",
+  "last_query_start": "2026-10-09T15:48:29.732305Z",
+  "dashboard_count": 1,
+  "type": "question",
+  "average_query_time": 360.0,
+  "creator_id": 1,
+  "moderation_reviews": [],
+  "updated_at": "2026-10-09T15:48:30.090456Z",
+  "made_public_by_id": null,
+  "embedding_params": null,
+  "cache_ttl": null,
+  "dataset_query": {
+    "type": "native",
+    "database": 2,
+    "native": {
+      "query": "SELECT COUNT(*) AS total_fraud_transactions FROM marts.fact_transactions WHERE is_fraud = 1;"
+    }
+  },
+  "id": 2,
+  "parameter_mappings": [],
+  "display": "scalar",
+  "entity_id": "2o9_VLIa83eqNrr04sAFa",
+  "collection_preview": true,
+  "last-edit-info": {
+    "id": 1,
+    "email": "admin@frauddw.local",
+    "first_name": "Fraud",
+    "last_name": "DW Admin",
+    "timestamp": "2026-10-09T15:39:28.019445Z"
+  },
+  "visualization_settings": {},
+  "collection": {
+    "authority_level": null,
+    "description": "Fraud analytics questions (Phase 20)",
+    "archived": false,
+    "slug": "fraud_analytics",
+    "name": "Fraud Analytics",
+    "personal_owner_id": null,
+    "type": null,
+    "id": 2,
+    "entity_id": "t9j8G5mnrAt5E685CATtX",
+    "location": "/",
+    "namespace": null,
+    "is_personal": false,
+    "created_at": "2026-10-09T15:36:24.136134Z"
+  },
+  "metabase_version": "v0.49.0 (46c668b)",
+  "parameters": [],
+  "dataset": false,
+  "created_at": "2026-10-09T15:39:27.995895Z",
+  "parameter_usage_count": 0,
+  "public_uuid": null
+}

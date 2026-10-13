@@ -1,0 +1,196 @@
+{
+  "description": "T\u1ef7 l\u1ec7 gian l\u1eadn theo product_cd (\u0111\u00e3 materialize trong fact_transactions)",
+  "archived": false,
+  "collection_position": null,
+  "table_id": null,
+  "result_metadata": [
+    {
+      "display_name": "product_cd",
+      "field_ref": [
+        "field",
+        "product_cd",
+        {
+          "base-type": "type/Text"
+        }
+      ],
+      "name": "product_cd",
+      "base_type": "type/Text",
+      "effective_type": "type/Text",
+      "semantic_type": null,
+      "fingerprint": {
+        "global": {
+          "distinct-count": 5,
+          "nil%": 0.0
+        },
+        "type": {
+          "type/Text": {
+            "percent-json": 0.0,
+            "percent-url": 0.0,
+            "percent-email": 0.0,
+            "percent-state": 0.0,
+            "average-length": 1.0
+          }
+        }
+      }
+    },
+    {
+      "display_name": "total_transactions",
+      "field_ref": [
+        "field",
+        "total_transactions",
+        {
+          "base-type": "type/BigInteger"
+        }
+      ],
+      "name": "total_transactions",
+      "base_type": "type/BigInteger",
+      "effective_type": "type/BigInteger",
+      "semantic_type": null,
+      "fingerprint": {
+        "global": {
+          "distinct-count": 5,
+          "nil%": 0.0
+        },
+        "type": {
+          "type/Number": {
+            "min": 11628.0,
+            "q1": 27675.0,
+            "q3": 161306.75,
+            "max": 439670.0,
+            "sd": 180903.33986828435,
+            "avg": 118108.0
+          }
+        }
+      }
+    },
+    {
+      "display_name": "fraud_transactions",
+      "field_ref": [
+        "field",
+        "fraud_transactions",
+        {
+          "base-type": "type/BigInteger"
+        }
+      ],
+      "name": "fraud_transactions",
+      "base_type": "type/BigInteger",
+      "effective_type": "type/BigInteger",
+      "semantic_type": null,
+      "fingerprint": {
+        "global": {
+          "distinct-count": 5,
+          "nil%": 0.0
+        },
+        "type": {
+          "type/Number": {
+            "min": 686.0,
+            "q1": 1241.0,
+            "q3": 8248.25,
+            "max": 8969.0,
+            "sd": 4005.017453145492,
+            "avg": 4132.6
+          }
+        }
+      }
+    },
+    {
+      "display_name": "fraud_rate_pct",
+      "field_ref": [
+        "field",
+        "fraud_rate_pct",
+        {
+          "base-type": "type/Decimal"
+        }
+      ],
+      "name": "fraud_rate_pct",
+      "base_type": "type/Decimal",
+      "effective_type": "type/Decimal",
+      "semantic_type": null,
+      "fingerprint": {
+        "global": {
+          "distinct-count": 5,
+          "nil%": 0.0
+        },
+        "type": {
+          "type/Number": {
+            "min": 2.04,
+            "q1": 3.3449999999999998,
+            "q3": 7.3475,
+            "max": 11.69,
+            "sd": 3.6690094030950644,
+            "avg": 5.636
+          }
+        }
+      }
+    }
+  ],
+  "creator": {
+    "email": "admin@frauddw.local",
+    "first_name": "Fraud",
+    "last_login": "2026-10-09T15:54:38.111671Z",
+    "is_qbnewb": true,
+    "is_superuser": true,
+    "id": 1,
+    "last_name": "DW Admin",
+    "date_joined": "2026-10-09T15:25:47.078083Z",
+    "common_name": "Fraud DW Admin"
+  },
+  "initially_published_at": null,
+  "can_write": true,
+  "database_id": 2,
+  "enable_embedding": false,
+  "collection_id": 2,
+  "query_type": "native",
+  "name": "Gian l\u1eadn theo m\u00e3 s\u1ea3n ph\u1ea9m",
+  "last_query_start": "2026-10-09T15:48:32.1613Z",
+  "dashboard_count": 1,
+  "type": "question",
+  "average_query_time": 342.5,
+  "creator_id": 1,
+  "moderation_reviews": [],
+  "updated_at": "2026-10-09T15:48:32.469166Z",
+  "made_public_by_id": null,
+  "embedding_params": null,
+  "cache_ttl": null,
+  "dataset_query": {
+    "type": "native",
+    "database": 2,
+    "native": {
+      "query": "SELECT product_cd, COUNT(*) AS total_transactions, COUNT(*) FILTER (WHERE is_fraud = 1) AS fraud_transactions, ROUND(100.0 * COUNT(*) FILTER (WHERE is_fraud = 1) / NULLIF(COUNT(*), 0), 2) AS fraud_rate_pct FROM marts.fact_transactions GROUP BY product_cd ORDER BY fraud_rate_pct DESC;"
+    }
+  },
+  "id": 7,
+  "parameter_mappings": [],
+  "display": "bar",
+  "entity_id": "_E3W88CRXm6YKEGQ9vsFt",
+  "collection_preview": true,
+  "last-edit-info": {
+    "id": 1,
+    "email": "admin@frauddw.local",
+    "first_name": "Fraud",
+    "last_name": "DW Admin",
+    "timestamp": "2026-10-09T15:39:31.502888Z"
+  },
+  "visualization_settings": {},
+  "collection": {
+    "authority_level": null,
+    "description": "Fraud analytics questions (Phase 20)",
+    "archived": false,
+    "slug": "fraud_analytics",
+    "name": "Fraud Analytics",
+    "personal_owner_id": null,
+    "type": null,
+    "id": 2,
+    "entity_id": "t9j8G5mnrAt5E685CATtX",
+    "location": "/",
+    "namespace": null,
+    "is_personal": false,
+    "created_at": "2026-10-09T15:36:24.136134Z"
+  },
+  "metabase_version": "v0.49.0 (46c668b)",
+  "parameters": [],
+  "dataset": false,
+  "created_at": "2026-10-09T15:39:31.488522Z",
+  "parameter_usage_count": 0,
+  "public_uuid": null
+}

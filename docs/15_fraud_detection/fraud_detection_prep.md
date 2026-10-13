@@ -2,268 +2,260 @@
 
 ## 1. MỤC TIÊU
 
-Chuẩn bị dữ liệu cho ML:
-- Join transactions + identity
-- Feature engineering
-- Handle missing values
-- Encode categorical features
-- Train/test split (stratified, 70/15/15)
+Chuẩn bị dữ liệu cho Machine Learning từ Data Warehouse:
+- Load dữ liệu từ `marts.fact_transactions` (đã có identity join từ Phase 12)
+- Feature engineering xác định (deterministic)
+- Handle missing values & encode categorical features
+- Train/Validation/Test split stratified 70/15/15
+- Lưu Parquet + metadata JSON
 
 ---
 
-## 2. CẤU TRÚC THƯ MỤC
+## 2. CẤU TRÚC THƯ MỤC THỰC TẾ
 
 ```
 ml/
-├── data/                     # Generated features
+├── config.py                      # Config (DB URL, split ratios, paths)
 ├── features/
 │   ├── __init__.py
-│   ├── prepare.py           # Main data prep
-│   └── features.py          # Feature engineering functions
+│   ├── engineering.py             # Deterministic feature engineering
+│   ├── preprocessing.py           # Preprocessing pipeline (fit on TRAIN only)
+│   ├── prepare.py                 # Main pipeline orchestrator
+│   └── encoding.py                # (reserved)
+├── data/
+│   ├── train.parquet              # 413,378 × 1,015 (1014 features + target)
+│   ├── val.parquet                # 88,581 × 1,015
+│   ├── test.parquet               # 88,581 × 1,015
+│   └── feature_metadata.json      # Auto-generated metadata
 ├── __init__.py
-├── config.py                # Configuration
 └── notebooks/
-    └── eda.ipynb            # EDA exploration
+    └── eda.ipynb                  # EDA exploration
 ```
 
 ---
 
-## 3. FEATURE ENGINEERING
+## 3. THUẬT TOÁN & PIPELINE
 
-### 3.1 Các features mới đề xuất
-
-1. **Transaction count per device** — số giao dịch trên mỗi thiết bị
-2. **Email domain frequency** — tần suất email domain
-3. **Card frequency** — tần suất card1-card6
-4. **Transaction amount bin** — phân loại transaction_amt thành bins
-5. **Time-based features** — hour, day_of_week, is_weekend
-6. **Missing indicator** — đánh dấu cột có missing values
-
-### 3.2 Code feature engineering
-
-File: `ml/features/features.py`
+### 3.1 Load Data (`prepare.py:load_data()`)
 
 ```python
-"""
-Feature engineering functions for fraud detection.
-Phase 15: Data Preparation & Feature Engineering
-"""
-
-import pandas as pd
-import numpy as np
-
-def add_time_features(df):
-    """Thêm features thời gian từ TransactionDT."""
-    # TransactionDT is seconds since 1970-01-01
-    df['transaction_dt'] = pd.to_datetime(df['transaction_dt'], unit='s')
-    df['transaction_hour'] = df['transaction_dt'].dt.hour
-    df['transaction_dayofweek'] = df['transaction_dt'].dt.dayofweek
-    df['is_weekend'] = df['transaction_dayofweek'].isin([5, 6]).astype(int)
-    return df
-
-def add_missing_indicators(df):
-    """Thêm indicator cho missing values."""
-    # Columns with high missing rates
-    id_cols = [c for c in df.columns if c.startswith('id_')]
-    for col in id_cols:
-        if df[col].isna().any():
-            df[f'{col}_missing'] = df[col].isna().astype(int)
-    
-    # Device info missing
-    df['device_info_missing'] = (df['device_info'].isna() | (df['device_info'] == '')).astype(int)
-    return df
-
-def add_frequency_features(df):
-    """Thêm features tần suất xuất hiện."""
-    # Device type frequency
-    device_counts = df['device_type'].value_counts(normalize=True)
-    df['device_type_freq'] = df['device_type'].map(device_counts)
-    
-    # Product CD frequency
-    product_counts = df['product_cd'].value_counts(normalize=True)
-    df['product_cd_freq'] = df['product_cd'].map(product_counts)
-    
-    # Email domain frequency
-    email_counts = df['p_emaildomain'].value_counts(normalize=True)
-    df['p_emaildomain_freq'] = df['p_emaildomain'].map(email_counts).fillna(0)
-    
-    return df
-
-def add_binned_amount(df):
-    """Thêm binned transaction amount."""
-    bins = [0, 50, 100, 200, 500, 1000, 5000, 10000, np.inf]
-    labels = ['0-50', '50-100', '100-200', '200-500', '500-1K', '1K-5K', '5K-10K', '10K+']
-    df['transaction_amt_bin'] = pd.cut(df['transaction_amt'], bins=bins, labels=labels)
-    return df
-
-def encode_categoricals(df):
-    """Encode categorical features."""
-    # One-hot encoding cho categorical
-    cat_cols = ['product_cd', 'card4', 'card6', 'transaction_amt_bin']
-    df = pd.get_dummies(df, columns=cat_cols, prefix=cat_cols)
-    return df
-
-def fill_missing_values(df):
-    """Fill missing values."""
-    # Numeric columns: fill với median
-    numeric_cols = df.select_dtypes(include=['float64', 'int64']).columns
-    for col in numeric_cols:
-        if df[col].isna().any():
-            df[col] = df[col].fillna(df[col].median())
-    
-    # Categorical columns: fill với mode hoặc 'Unknown'
-    cat_cols = df.select_dtypes(include=['object']).columns
-    for col in cat_cols:
-        if df[col].isna().any():
-            df[col] = df[col].fillna('Unknown')
-    
-    return df
-
-def prepare_features(df):
-    """Main function: apply all feature engineering steps."""
-    df = add_time_features(df)
-    df = add_missing_indicators(df)
-    df = add_frequency_features(df)
-    df = add_binned_amount(df)
-    df = encode_categoricals(df)
-    df = fill_missing_values(df)
-    return df
+# Query đơn giản từ marts.fact_transactions
+# (các cột identity đã được join ở Phase 12 dbt fact_transactions.sql)
+SELECT * FROM marts.fact_transactions
 ```
 
----
+- 590,540 rows, 438 columns (bao gồm sẵn device_type, device_info, id_01..id_38)
+- Grain: 1 row = 1 transaction (transaction_id unique)
 
-## 4. TRAIN/TEST SPLIT
+### 3.2 Feature Engineering (`features/engineering.py`)
 
-File: `ml/features/prepare.py`
+| Function | Mô tả | Output features |
+|----------|-------|-----------------|
+| `add_time_features` | Từ `transaction_dt` (seconds) → hour, day_index, dayofweek, is_weekend | `transaction_hour`, `transaction_day_index`, `transaction_dayofweek`, `is_weekend` |
+| `add_missing_indicators` | Tạo cột `_missing` cho id_01..id_38, device_info, p_emaildomain, r_emaildomain | 41 `_missing` columns (int8) |
+| `add_amount_bin` | Bin `transaction_amt` theo 9 bins | `transaction_amt_bin` (category) |
+| `add_all_engineered_features` | Orchestrator | +46 features |
+
+**Quan trọng:** Frequency encoding (`device_type_freq`, `product_cd_freq`, `card*_freq`) được tách sang `preprocessing.py` để fit chỉ trên TRAIN.
+
+### 3.3 Preprocessing Pipeline (`features/preprocessing.py`)
 
 ```python
-"""
-Data preparation: load data, engineer features, split.
-"""
+# ColumnTransformer với 3 nhánh:
+1. Numeric:  SimpleImputer(median) → StandardScaler
+2. Categorical: SimpleImputer(most_frequent) → OneHotEncoder(handle_unknown='ignore')
+3. Identity (id_01..id_38): SimpleImputer(constant=0) → StandardScaler
+```
 
-import pandas as pd
-import numpy as np
-from sklearn.model_selection import train_test_split
-from sqlalchemy import create_engine, text
-import sys
-import os
+**Key principle:** `fit_transform_datasets(train_X, val_X, test_X)` — **FIT chỉ trên TRAIN**, TRANSFORM cả 3 tập.
 
-sys.path.append(os.path.dirname(__file__))
-from features import prepare_features
+### 3.4 Split (`prepare.py:split_data()`)
 
-DB_URL = "postgresql://postgres:postgres@localhost:5432/ecommerce_fraud_dw"
-RANDOM_STATE = 42
-
-def load_data():
-    """Load data from staging layer."""
-    engine = create_engine(DB_URL)
-    
-    query = """
-    SELECT t.*, i.device_type, i.device_info,
-           i.id_01, i.id_02, i.id_03, i.id_04, i.id_05, i.id_06,
-           i.id_07, i.id_08, i.id_09, i.id_10, i.id_11,
-           i.id_12, i.id_13, i.id_14, i.id_15, i.id_16, i.id_17,
-           i.id_18, i.id_19, i.id_20, i.id_21, i.id_22, i.id_23,
-           i.id_24, i.id_25, i.id_26, i.id_27, i.id_28, i.id_29,
-           i.id_30, i.id_31, i.id_32, i.id_33, i.id_34, i.id_35,
-           i.id_36, i.id_37, i.id_38
-    FROM marts.fact_transactions t
-    LEFT JOIN marts.dim_device d ON t.device_type = d.device_type
-    """
-    
-    df = pd.read_sql(query, engine)
-    engine.dispose()
-    return df
-
-
-def split_data(df, test_size=0.15, val_size=0.15):
-    """
-    Stratified split: 70% train, 15% validation, 15% test.
-    """
-    # First split: train vs (val + test)
-    train_df, temp_df = train_test_split(
-        df, test_size=(val_size + test_size), 
-        stratify=df['is_fraud'], random_state=RANDOM_STATE
-    )
-    
-    # Second split: val vs test
-    val_df, test_df = train_test_split(
-        temp_df, test_size=test_size / (val_size + test_size),
-        stratify=temp_df['is_fraud'], random_state=RANDOM_STATE
-    )
-    
-    return train_df, val_df, test_df
-
-
-def main():
-    print("Loading data from staging layer...")
-    df = load_data()
-    print(f"Total rows: {len(df)}")
-    print(f"Columns: {len(df.columns)}")
-    
-    print("Engineering features...")
-    df = prepare_features(df)
-    
-    print("Splitting data (70/15/15 stratified)...")
-    train_df, val_df, test_df = split_data(df)
-    
-    print(f"Train: {len(train_df)} ({train_df['is_fraud'].mean()*100:.2f}% fraud)")
-    print(f"Val:   {len(val_df)} ({val_df['is_fraud'].mean()*100:.2f}% fraud)")
-    print(f"Test:  {len(test_df)} ({test_df['is_fraud'].mean()*100:.2f}% fraud)")
-    
-    # Save splits
-    os.makedirs('ml/data', exist_ok=True)
-    train_df.to_parquet('ml/data/train.parquet', index=False)
-    val_df.to_parquet('ml/data/val.parquet', index=False)
-    test_df.to_parquet('ml/data/test.parquet', index=False)
-    
-    # Save feature list
-    feature_cols = [c for c in df.columns if c not in ['is_fraud', 'transaction_id', 'transaction_dt']]
-    with open('ml/data/features.txt', 'w') as f:
-        for col in feature_cols:
-            f.write(col + '\n')
-    
-    print(f"Features: {len(feature_cols)}")
-    print("Data saved to ml/data/")
-    return train_df, val_df, test_df
-
-
-if __name__ == '__main__':
-    main()
+```python
+# Stratified 70/15/15
+train_df, temp_df = train_test_split(df, test_size=0.30, stratify=df['is_fraud'], random_state=42)
+val_df, test_df = train_test_split(temp_df, test_size=0.5, stratify=temp_df['is_fraud'], random_state=42)
 ```
 
 ---
 
-## 5. CHẠY
+## 4. KẾT QUẢ THỰC TẾ (ACTUAL RESULTS)
 
-```bash
+### 4.1 Load & Validation
+```
+Loaded rows: 590,540
+Loaded columns: 438
+Base dataset validation:
+  Rows: 590,540
+  Distinct IDs: 590,540
+  Null IDs: 0
+  Duplicate IDs: 0
+```
+
+### 4.2 Split Verification
+| Split | Rows | % Total | Fraud Count | Fraud Rate |
+|-------|------|---------|-------------|------------|
+| Train | 413,378 | 70.00% | 14,464 | 3.4990% |
+| Val | 88,581 | 15.00% | 3,100 | 3.4996% |
+| Test | 88,581 | 15.00% | 3,099 | 3.4985% |
+| **Total** | **590,540** | **100%** | **20,663** | **3.4990%** |
+
+**Baseline Phase 14:** 20,663 / 590,540 = 3.4990% ✅
+
+### 4.3 Overlap Check (từ code validation)
+```
+TRAIN ∩ VAL = 0 ✅
+TRAIN ∩ TEST = 0 ✅
+VAL ∩ TEST = 0 ✅
+Total unique IDs = 590,540 ✅
+```
+
+### 4.4 Feature Matrix
+| Metric | Train | Val | Test |
+|--------|-------|-----|------|
+| Rows | 413,378 | 88,581 | 88,581 |
+| Features | 1,014 | 1,014 | 1,014 |
+| Target (is_fraud) | 1 | 1 | 1 |
+| Total columns | 1,015 | 1,015 | 1,015 |
+| NaN | 0 | 0 | 0 |
+| Dtypes | float32(1014) + int8(1) | same | same |
+
+**Feature breakdown (từ feature_metadata.json):**
+- `num__` (numeric): 390+ raw + 9 freq + 46 engineered + 38 id missing = ~480
+- `cat__` (one-hot): card4(5), card6(5), device_info(28+), m1-m9(18+), id_12..id_38(100+), p/r_emaildomain(40+), product_cd(5), transaction_amt_bin(8), device_type(3) = ~534
+- **Total: 1,014 features**
+
+---
+
+## 5. FILES ĐẦU RA
+
+### 5.1 Parquet Files
+```
+ml/data/train.parquet    (413,378 × 1,015)
+ml/data/val.parquet      (88,581 × 1,015)
+ml/data/test.parquet     (88,581 × 1,015)
+```
+Tất cả: `float32` features + `int8` target, **NaN = 0**
+
+### 5.2 Metadata (auto-generated: `feature_metadata.json`)
+```json
+{
+  "phase": 15,
+  "target": "is_fraud",
+  "id_column": "transaction_id",
+  "random_state": 42,
+  "split": {"train": 0.7, "validation": 0.15, "test": 0.15},
+  "rows": {"train": 413378, "validation": 88581, "test": 88581},
+  "features": {
+    "count": 1014,
+    "names": ["num__addr1", "num__addr2", ..., "cat__transaction_amt_bin_5K-10K"]
+  }
+}
+```
+
+---
+
+## 6. CHẠY PIPELINE
+
+```powershell
 .venv\Scripts\Activate.ps1
-cd ml
-python features/prepare.py
+python -m ml.features.prepare
+```
+
+**Output thực tế:**
+```
+======================================================================
+PHASE 15 - FRAUD DETECTION DATA PREPARATION
+======================================================================
+
+[1/7] Loading data...
+Loaded rows: 590,540
+Loaded columns: 438
+
+[2/7] Validating base dataset...
+Base dataset validation
+-----------------------
+Rows:              590,540
+Distinct IDs:      590,540
+Null IDs:          0
+Duplicate IDs:     0
+
+[3/7] Splitting data...
+Split validation
+----------------
+Train: 413,378 (70.00%) fraud=3.4990%
+Val:   88,581 (15.00%) fraud=3.4996%
+Test:  88,581 (15.00%) fraud=3.4985%
+
+[4/7] Engineering features...
+
+[5/7] Separating features and target...
+Raw ML features before preprocessing: 491
+
+[6/7] Fitting preprocessing on TRAIN only...
+Processed feature count: 1,014
+
+[7/7] Saving processed datasets...
+
+======================================================================
+PHASE 15 COMPLETED
+======================================================================
+Train: 413,378
+Validation: 88,581
+Test: 88,581
+Features: 1,014
+Saved to: ml\data
 ```
 
 ---
 
-## 6. EXPECTED OUTPUT
+## 7. CHECKLIST PHASE 15
 
-```text
-Loading data from staging layer...
-Total rows: 590,540
-Columns: 415
-Engineering features...
-Splitting data (70/15/15 stratified)...
-Train: 413,378 (3.49% fraud)
-Val:   88,581  (3.50% fraud)
-Test:  88,581  (3.51% fraud)
-Features: 412
-Data saved to ml/data/
-```
+| Tiêu chí | Trạng thái | Chi tiết |
+|----------|------------|----------|
+| **A. Grain đúng** | ✅ | 590,540 rows = 590,540 distinct transaction_id |
+| **B. Split đúng** | ✅ | 413,378 / 88,581 / 88,581 (70/15/15) |
+| **C. Fraud rate giữ** | ✅ | 3.4990% baseline → Train 3.4990%, Val 3.4996%, Test 3.4985% |
+| **D. Không overlap** | ✅ | Code validation: TRAIN∩VAL=0, TRAIN∩TEST=0, VAL∩TEST=0 |
+| **E. NaN = 0** | ✅ | Preprocessing impute + validation: 0 NaN all splits |
+| **F. Không object/string** | ✅ | Tất cả features float32, target int8 |
+| **G. Cùng feature count** | ✅ | 1,014 features train/val/test |
+| **H. Preprocessor fit TRAIN only** | ✅ | `fit_transform_datasets()` fit trên train_X, transform val_X/test_X |
 
 ---
 
-## 7. Liên hệ
+## 8. SAI LẪM PHỔ BIỂN ĐÃ TRÁNH
+
+| Sai lầm | Cách xử lý đúng |
+|---------|-----------------|
+| Frequency encoding fit trên toàn bộ data | ❌ Fit trên TRAIN → transform TRAIN/VAL/TEST |
+| OneHotEncoder không handle unknown | ❌ `handle_unknown='ignore'` |
+| Join identity tạo duplicate columns | ❌ marts.fact_transactions đã có identity từ Phase 12 |
+| Fill missing trước split | ❌ Imputer fit trên TRAIN only |
+| transaction_id giữ làm feature | ❌ Drop trước preprocessing |
+
+---
+
+## 9. LIÊN HỆ
 
 - Trước: [PHASE 14 — Data Quality](../14_data_quality/data_quality.md)
 - Sau: [PHASE 16 — Machine Learning](../16_machine_learning/machine_learning.md)
 
-*Cập nhật: 02/09/2026 | Version: 1.0*
+---
+
+## 10. EVIDENCE
+
+| File | Mô tả |
+|------|-------|
+| `ml/features/prepare.py` | Main orchestrator |
+| `ml/features/engineering.py` | Deterministic features |
+| `ml/features/preprocessing.py` | ColumnTransformer pipeline |
+| `ml/config.py` | Configuration |
+| `ml/data/train.parquet` | Train split |
+| `ml/data/val.parquet` | Validation split |
+| `ml/data/test.parquet` | Test split |
+| `ml/data/feature_metadata.json` | Feature metadata |
+
+---
+
+*Cập nhật: 2026-10-08 | Version: 2.0 | Status: PASSED ✅*

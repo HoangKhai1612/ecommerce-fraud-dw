@@ -74,13 +74,13 @@ PHASE 11 — STAGING LAYER               → docs/11_staging/  + dbt/models/stag
                                         Status: ✅ 100% PASS (dbt views, staging schema)
 
 PHASE 12 — DBT                         → docs/12_dbt/  + dbt/models/
-                                        Status: ⏳ NOT_STARTED
+                                         Status: ✅ 100% PASSED
 
 PHASE 13 — AIRFLOW                     → docs/13_airflow/  + airflow/dags/
-                                        Status: ⏳ NOT_STARTED
+                                         Status: ✅ 100% PASSED
 
 PHASE 14 — DATA QUALITY                → docs/14_data_quality/
-                                        Status: ⏳ NOT_STARTED
+                                         Status: ✅ 100% PASSED
 
 PHASE 15 — FRAUD DATA PREPARATION      → docs/15_fraud_detection/
                                         Status: ⏳ NOT_STARTED

@@ -5,7 +5,9 @@
 Huấn luyện 3 mô hình ML để phát hiện gian lận:
 1. Logistic Regression (baseline)
 2. Random Forest
-3. XGBoost (dự kiến tốt nhất)
+3. XGBoost (best model)
+
+So sánh dựa trên **ROC-AUC** trên validation set.
 
 ---
 
@@ -13,313 +15,232 @@ Huấn luyện 3 mô hình ML để phát hiện gian lận:
 
 ```bash
 .venv\Scripts\Activate.ps1
-pip install scikit-learn xgboost lightgbm
-# Cần cài thêm: pip install scikit-learn xgboost
+pip install scikit-learn xgboost joblib
 ```
 
 ---
 
-## 3. CẤU TRÚC THƯ MỤC
+## 3. CẤU TRÚC THƯ MỤC THỰC TẾ
 
 ```
 ml/
-├── data/                       # train.parquet, val.parquet, test.parquet
+├── config.py                      # Configuration
 ├── features/
-│   ├── __init__.py
+│   ├── engineering.py
+│   ├── preprocessing.py
 │   ├── prepare.py
-│   └── features.py
-├── models/                     # Trained models (binary)
-│   └── (auto-generated)
-├── notebooks/
-├── config.py
-├── train.py                    # Main training script
-├── evaluate.py                 # Evaluation utilities
+│   └── __init__.py
+├── models/                         # Trained artifacts (auto-generated)
+│   ├── logistic_regression.pkl
+│   ├── logistic_scaler.pkl
+│   ├── random_forest.pkl
+│   ├── xgboost.pkl
+│   ├── feature_columns.json
+│   └── training_results.json
+├── data/
+│   ├── train.parquet
+│   ├── val.parquet
+│   ├── test.parquet
+│   └── feature_metadata.json
+├── train.py                        # Main training script
+├── evaluate.py
 └── __init__.py
 ```
 
 ---
 
-## 4. TRAINING PIPELINE
+## 4. TRAINING PIPELINE (ml/train.py)
 
-File: `ml/train.py`
-
+### 4.1 Data Loading & Validation
 ```python
-"""
-Phase 16: Machine Learning Training
-Train 3 models: Logistic Regression, Random Forest, XGBoost
-"""
+train_df = pd.read_parquet('ml/data/train.parquet')  # 413,378 × 1015
+val_df = pd.read_parquet('ml/data/val.parquet')      # 88,581 × 1015
 
-import pandas as pd
-import numpy as np
-import joblib
-import os
-import sys
-from sklearn.model_selection import RandomizedSearchCV
-from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import classification_report, roc_auc_score
-from xgboost import XGBClassifier
-import warnings
-warnings.filterwarnings('ignore')
+# Target: is_fraud (int8), Features: 1014 numeric (float32)
+```
 
-RANDOM_STATE = 42
-MODEL_DIR = 'ml/models'
-os.makedirs(MODEL_DIR, exist_ok=True)
+### 4.2 Hyperparameter Tuning Strategy
+- **Subset tuning**: 50,000 samples (memory efficient)
+- **RandomizedSearchCV**: n_iter reduced, cv=2 (fast)
+- **Refit on full training data** after best params found
+- **n_jobs=1** for CV to limit memory
 
+---
 
-def load_data():
-    """Load train/val/test splits."""
-    train_df = pd.read_parquet('ml/data/train.parquet')
-    val_df = pd.read_parquet('ml/data/val.parquet')
-    test_df = pd.read_parquet('ml/data/test.parquet')
-    
-    # Load feature names
-    with open('ml/data/features.txt') as f:
-        feature_cols = [line.strip() for line in f if line.strip()]
-    
-    # Handle boolean columns (convert to int)
-    bool_cols = train_df.select_dtypes(include=['bool']).columns
-    for col in bool_cols:
-        train_df[col] = train_df[col].astype(int)
-        val_df[col] = val_df[col].astype(int)
-        test_df[col] = test_df[col].astype(int)
-    
-    return train_df, val_df, test_df, feature_cols
+## 5. KẾT QUẢ THỰC TẾ (ACTUAL RESULTS)
 
+### 5.1 Logistic Regression
+| Metric | Value |
+|--------|-------|
+| Best CV ROC-AUC | 0.844992 |
+| Best params | `{'C': 0.01, 'penalty': 'l2', 'solver': 'lbfgs', 'class_weight': None}` |
+| **Val ROC-AUC** | **0.869964** |
+| **Val PR-AUC** | **0.485851** |
+| **Val F1 (0.5)** | **0.422111** |
+| Precision (0.5) | 0.817424 |
+| Recall (0.5) | 0.284516 |
 
-def get_X_y(df, feature_cols):
-    """Extract features and label."""
-    X = df[feature_cols].select_dtypes(include=['int64', 'float64'])
-    y = df['is_fraud']
-    return X, y
+**Confusion Matrix (val, threshold=0.5):**
+```
+[[85284   197]   ← Non-Fraud: 85,481 total
+ [ 2218   882]]  ← Fraud: 3,100 total
+```
 
+### 5.2 Random Forest
+| Metric | Value |
+|--------|-------|
+| Best CV ROC-AUC | 0.876630 |
+| Best params | `{'n_estimators': 200, 'max_depth': 20, 'min_samples_split': 2, 'min_samples_leaf': 2, 'class_weight': None, 'max_features': 'sqrt'}` |
+| **Val ROC-AUC** | **0.912991** |
+| **Val PR-AUC** | **0.645182** |
+| **Val F1 (0.5)** | **0.521094** |
+| Precision (0.5) | 0.925865 |
+| Recall (0.5) | 0.362581 |
 
-def train_logistic_regression(X_train, y_train, X_val, y_val):
-    """Train Logistic Regression with hyperparameter tuning."""
-    print("\n=== Training Logistic Regression ===")
-    
-    # Scale features
-    scaler = StandardScaler()
-    X_train_scaled = scaler.fit_transform(X_train)
-    X_val_scaled = scaler.transform(X_val)
-    
-    # Hyperparameter grid
-    param_dist = {
-        'C': [0.001, 0.01, 0.1, 1, 10, 100],
-        'penalty': ['l1', 'l2'],
-        'solver': ['liblinear', 'saga'],
-        'class_weight': ['balanced', None],
-    }
-    
-    model = LogisticRegression(max_iter=1000, random_state=RANDOM_STATE)
-    
-    # Use smaller CV for speed
-    search = RandomizedSearchCV(
-        model, param_distributions=param_dist,
-        n_iter=10, scoring='roc_auc', cv=3,
-        random_state=RANDOM_STATE, n_jobs=-1, verbose=1
-    )
-    
-    search.fit(X_train_scaled, y_train)
-    
-    print(f"Best params: {search.best_params_}")
-    print(f"Best CV score: {search.best_score_:.4f}")
-    
-    # Save model + scaler
-    joblib.dump(search.best_estimator_, f'{MODEL_DIR}/lr_model.pkl')
-    joblib.dump(scaler, f'{MODEL_DIR}/lr_scaler.pkl')
-    
-    return search.best_estimator_, scaler
+**Confusion Matrix (val, threshold=0.5):**
+```
+[[85391    90]
+ [ 1976  1124]]
+```
 
+### 5.3 XGBoost
+| Metric | Value |
+|--------|-------|
+| Best CV ROC-AUC | 0.891390 |
+| Best params | `{'n_estimators': 200, 'max_depth': 5, 'learning_rate': 0.05, 'subsample': 0.8, 'colsample_bytree': 1.0, 'min_child_weight': 3, 'reg_alpha': 0.1, 'reg_lambda': 0.5, 'scale_pos_weight': 15}` |
+| **Val ROC-AUC** | **0.916026** |
+| **Val PR-AUC** | **0.591256** |
+| **Val F1 (0.5)** | **0.438063** |
+| Precision (0.5) | 0.316045 |
+| Recall (0.5) | 0.713548 |
 
-def train_random_forest(X_train, y_train, X_val, y_val):
-    """Train Random Forest with hyperparameter tuning."""
-    print("\n=== Training Random Forest ===")
-    
-    param_dist = {
-        'n_estimators': [100, 200, 300],
-        'max_depth': [10, 20, 30, None],
-        'min_samples_split': [2, 5, 10],
-        'min_samples_leaf': [1, 2, 4],
-        'class_weight': ['balanced', 'balanced_subsample', None],
-        'max_features': ['sqrt', 'log2'],
-    }
-    
-    model = RandomForestClassifier(random_state=RANDOM_STATE)
-    
-    search = RandomizedSearchCV(
-        model, param_distributions=param_dist,
-        n_iter=15, scoring='roc_auc', cv=3,
-        random_state=RANDOM_STATE, n_jobs=-1, verbose=1
-    )
-    
-    search.fit(X_train, y_train)
-    
-    print(f"Best params: {search.best_params_}")
-    print(f"Best CV score: {search.best_score_:.4f}")
-    
-    joblib.dump(search.best_estimator_, f'{MODEL_DIR}/rf_model.pkl')
-    
-    return search.best_estimator_
-
-
-def train_xgboost(X_train, y_train, X_val, y_val):
-    """Train XGBoost with hyperparameter tuning."""
-    print("\n=== Training XGBoost ===")
-    
-    param_dist = {
-        'n_estimators': [100, 200, 300, 500],
-        'max_depth': [3, 5, 7, 9, 11],
-        'learning_rate': [0.001, 0.01, 0.1, 0.3],
-        'subsample': [0.6, 0.8, 1.0],
-        'colsample_bytree': [0.6, 0.8, 1.0],
-        'min_child_weight': [1, 3, 5],
-        'reg_alpha': [0.1, 0.5, 1.0],
-        'reg_lambda': [0.1, 0.5, 1.0],
-        'scale_pos_weight': [15, 18, 20, 25],  # Handle class imbalance
-    }
-    
-    model = XGBClassifier(
-        random_state=RANDOM_STATE,
-        use_label_encoder=False,
-        eval_metric='logloss',
-        tree_method='hist',
-        n_jobs=-1,
-    )
-    
-    search = RandomizedSearchCV(
-        model, param_distributions=param_dist,
-        n_iter=20, scoring='roc_auc', cv=3,
-        random_state=RANDOM_STATE, n_jobs=-1, verbose=1
-    )
-    
-    search.fit(X_train, y_train)
-    
-    print(f"Best params: {search.best_params_}")
-    print(f"Best CV score: {search.best_score_:.4f}")
-    
-    joblib.dump(search.best_estimator_, f'{MODEL_DIR}/xgb_model.pkl')
-    
-    return search.best_estimator_
-
-
-def evaluate_model(model, X_val, y_val, name):
-    """Evaluate model on validation set."""
-    print(f"\n--- Evaluation: {name} ---")
-    
-    y_pred_proba = model.predict_proba(X_val)[:, 1]
-    y_pred = (y_pred_proba >= 0.5).astype(int)
-    
-    auc = roc_auc_score(y_val, y_pred_proba)
-    print(f"AUC: {auc:.4f}")
-    print(classification_report(y_val, y_pred, target_names=['Non-Fraud', 'Fraud']))
-    
-    return auc
-
-
-def main():
-    print("Loading data...")
-    train_df, val_df, test_df, feature_cols = load_data()
-    
-    X_train, y_train = get_X_y(train_df, feature_cols)
-    X_val, y_val = get_X_y(val_df, feature_cols)
-    
-    print(f"Train: {X_train.shape}, Val: {X_val.shape}")
-    print(f"Train fraud rate: {y_train.mean():.4f}")
-    
-    # Get column names (in case alignment needed)
-    feature_cols_final = list(X_train.columns)
-    
-    # Train all 3 models
-    lr_model, scaler = train_logistic_regression(X_train, y_train, X_val, y_val)
-    rf_model = train_random_forest(X_train, y_train, X_val, y_val)
-    xgb_model = train_xgboost(X_train, y_train, X_val, y_val)
-    
-    # Save feature column names
-    joblib.dump(feature_cols_final, f'{MODEL_DIR}/feature_cols.pkl')
-    joblib.dump(scaler, f'{MODEL_DIR}/scaler.pkl')
-    
-    # Evaluate on validation set
-    print("\n=== VALIDATION RESULTS ===")
-    lr_auc = evaluate_model(lr_model, scaler.transform(X_val), y_val, "Logistic Regression")
-    rf_auc = evaluate_model(rf_model, X_val, y_val, "Random Forest")
-    xgb_auc = evaluate_model(xgb_model, X_val, y_val, "XGBoost")
-    
-    print(f"\n=== SUMMARY ===")
-    print(f"Logistic Regression AUC: {lr_auc:.4f}")
-    print(f"Random Forest AUC:       {rf_auc:.4f}")
-    print(f"XGBoost AUC:             {xgb_auc:.4f}")
-    
-    # Save best models comparison
-    results = {
-        'logistic_regression': lr_auc,
-        'random_forest': rf_auc,
-        'xgboost': xgb_auc,
-    }
-    joblib.dump(results, f'{MODEL_DIR}/results.pkl')
-    print(f"\nModels saved to {MODEL_DIR}/")
-    
-    return results
-
-
-if __name__ == '__main__':
-    main()
+**Confusion Matrix (val, threshold=0.5):**
+```
+[[80694  4787]
+ [  888  2212]]
 ```
 
 ---
 
-## 5. CHẠY
+## 6. MODEL COMPARISON (Validation Set)
 
-```bash
+| Model | ROC-AUC | PR-AUC | F1@0.5 | Precision@0.5 | Recall@0.5 | Best CV ROC-AUC |
+|-------|---------|--------|--------|---------------|------------|-----------------|
+| **XGBoost** | **0.916026** | 0.591256 | 0.438063 | 0.316045 | **0.713548** | 0.891390 |
+| Random Forest | 0.912991 | **0.645182** | **0.521094** | **0.925865** | 0.362581 | 0.876630 |
+| Logistic Regression | 0.869964 | 0.485851 | 0.422111 | 0.817424 | 0.284516 | 0.844992 |
+
+**Best Model by ROC-AUC: XGBoost** ✅
+
+---
+
+## 7. KEY INSIGHTS
+
+| Aspect | Finding |
+|--------|---------|
+| **Best ROC-AUC** | XGBoost (0.916) — marginally better than RF (0.913) |
+| **Best PR-AUC** | Random Forest (0.645) — better for imbalanced fraud detection |
+| **Best F1@0.5** | Random Forest (0.521) — best balance at default threshold |
+| **Best Recall@0.5** | XGBoost (0.714) — catches more fraud cases |
+| **Best Precision@0.5** | Random Forest (0.926) — fewer false alarms |
+
+> **Note**: Threshold=0.5 is arbitrary. For production, optimize threshold per business cost matrix (Phase 17).
+
+---
+
+## 8. MODEL ARTIFACTS (ml/models/)
+
+| File | Size | Description |
+|------|------|-------------|
+| `logistic_regression.pkl` | 4.9 KB | LR model |
+| `logistic_scaler.pkl` | 43.8 KB | StandardScaler for LR |
+| `random_forest.pkl` | 92.4 MB | RF model (200 trees) |
+| `xgboost.pkl` | 562 KB | XGBoost model |
+| `feature_columns.json` | 22.7 KB | 1,014 feature names |
+| `training_results.json` | 1.4 KB | Full metrics + best_model |
+
+---
+
+## 9. CHẠY PIPELINE
+
+```powershell
 .venv\Scripts\Activate.ps1
-cd ml
-python train.py
+python -m ml.train
+```
+
+**Output thực tế:**
+```
+======================================================================
+PHASE 16 - MACHINE LEARNING
+======================================================================
+Loading training data...
+Train shape: (413378, 1015)
+Validation shape: (88581, 1015)
+
+=== DATA VALIDATION ===
+Train fraud rate: 0.034990
+Validation fraud rate: 0.034996
+Number of features: 1014
+X_train: (413378, 1014)
+X_val:   (88581, 1014)
+
+======================================================================
+TRAINING LOGISTIC REGRESSION
+======================================================================
+Best CV ROC-AUC: 0.844992
+======================================================================
+TRAINING RANDOM FOREST
+======================================================================
+Best CV ROC-AUC: 0.876630
+======================================================================
+TRAINING XGBOOST
+======================================================================
+Best CV ROC-AUC: 0.891390
+
+======================================================================
+VALIDATION MODEL COMPARISON
+======================================================================
+XGBoost                   ROC-AUC=0.916026 PR-AUC=0.591256 F1=0.438063
+Random Forest             ROC-AUC=0.912991 PR-AUC=0.645182 F1=0.521094
+Logistic Regression       ROC-AUC=0.869964 PR-AUC=0.485851 F1=0.422111
+
+Best model: XGBoost
+Artifacts saved to: C:\Users\Administrator\Documents\ecommerce-fraud-dw\ml\models
+Phase 16 training completed.
 ```
 
 ---
 
-## 6. EXPECTED RESULTS
+## 10. SUCCESS CRITERIA
 
-| Model | Val AUC | Train Time | Notes |
-|-------|---------|-----------|-------|
-| Logistic Regression | ~0.85-0.90 | ~5 min | Baseline |
-| Random Forest | ~0.95-0.97 | ~15 min | Good performance |
-| XGBoost | ~0.97-0.99 | ~10 min | Best expected |
-
----
-
-## 7. MODEL ARTIFACTS
-
-```
-ml/models/
-├── lr_model.pkl          # Logistic Regression
-├── lr_scaler.pkl         # StandardScaler for LR
-├── rf_model.pkl          # Random Forest
-├── xgb_model.pkl         # XGBoost
-├── feature_cols.pkl      # Feature column order
-└── results.pkl           # AUC comparison
-```
+| Tiêu chí | Trạng thái | Chi tiết |
+|----------|------------|----------|
+| [✅] Logistic Regression trained | PASS | ROC-AUC=0.870, model + scaler saved |
+| [✅] Random Forest trained | PASS | ROC-AUC=0.913, model saved |
+| [✅] XGBoost trained | PASS | ROC-AUC=0.916 (best), model saved |
+| [✅] All evaluated on validation | PASS | Full metrics recorded |
+| [✅] Best model selected | PASS | XGBoost (highest ROC-AUC) |
+| [✅] Artifacts saved | PASS | 6 files in ml/models/ |
+| [✅] Feature columns saved | PASS | 1,014 features in JSON |
 
 ---
 
-## 8. SUCCESS CRITERIA
-
-```text
-[✅] Logistic Regression model trained + saved
-[✅] Random Forest model trained + saved
-[✅] XGBoost model trained + saved
-[✅] All 3 models evaluated (AUC scores recorded)
-[✅] Best model: XGBoost (highest AUC)
-[✅] Models saved as .pkl files
-[✅] Feature columns saved for prediction consistency
-```
-
----
-
-## 9. Liên hệ
+## 11. LIÊN HỆ
 
 - Trước: [PHASE 15 — Fraud Data Prep](../15_fraud_detection/fraud_detection_prep.md)
 - Sau: [PHASE 17 — Model Evaluation](../17_model_evaluation/model_evaluation.md)
 
-*Cập nhật: 02/09/2026 | Version: 1.0*
+---
+
+## 12. EVIDENCE
+
+| File | Mô tả |
+|------|-------|
+| `ml/train.py` | Training script (subset tuning, refit full) |
+| `ml/models/training_results.json` | Complete metrics for all 3 models |
+| `ml/models/feature_columns.json` | 1,014 feature names for serving |
+| `ml/models/*.pkl` | Serialized models |
+
+---
+
+*Cập nhật: 2026-10-08 | Version: 2.0 | Status: PASSED ✅*

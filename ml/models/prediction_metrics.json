@@ -1,0 +1,25 @@
+{
+  "model_version": "xgboost-v1-phase16",
+  "threshold": 0.5,
+  "n_predictions": 88581,
+  "n_fraud_actual": 3099,
+  "n_fraud_predicted": 6884,
+  "actual_fraud_rate": 0.03498492904798998,
+  "predicted_fraud_rate": 0.0777141824996331,
+  "roc_auc": 0.9172446865263226,
+  "pr_auc": 0.6008153787149417,
+  "precision": 0.31958163858221966,
+  "recall": 0.7099064214262666,
+  "f1": 0.4407492737654012,
+  "confusion_matrix": [
+    [
+      80798,
+      4684
+    ],
+    [
+      899,
+      2200
+    ]
+  ],
+  "classification_report": "              precision    recall  f1-score   support\n\n   Non-Fraud       0.99      0.95      0.97     85482\n       Fraud       0.32      0.71      0.44      3099\n\n    accuracy                           0.94     88581\n   macro avg       0.65      0.83      0.70     88581\nweighted avg       0.97      0.94      0.95     88581\n"
+}

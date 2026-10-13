@@ -1,0 +1,1150 @@
+{
+  "description": "T\u1ed5ng quan gian l\u1eadn giao d\u1ecbch th\u01b0\u01a1ng m\u1ea1i \u0111i\u1ec7n t\u1eed \u2014 Phase 20",
+  "archived": false,
+  "collection_position": null,
+  "dashcards": [
+    {
+      "size_x": 3,
+      "dashboard_tab_id": null,
+      "series": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "description": "KPI: t\u1ef7 l\u1ec7 giao d\u1ecbch gian l\u1eadn tr\u00ean to\u00e0n b\u1ed9 d\u1eef li\u1ec7u (%)",
+        "archived": false,
+        "collection_position": null,
+        "table_id": null,
+        "result_metadata": [
+          {
+            "display_name": "fraud_rate_pct",
+            "field_ref": [
+              "field",
+              "fraud_rate_pct",
+              {
+                "base-type": "type/Decimal"
+              }
+            ],
+            "name": "fraud_rate_pct",
+            "base_type": "type/Decimal",
+            "effective_type": "type/Decimal",
+            "semantic_type": null,
+            "fingerprint": {
+              "global": {
+                "distinct-count": 1,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "min": 3.5,
+                  "q1": 3.5,
+                  "q3": 3.5,
+                  "max": 3.5,
+                  "sd": null,
+                  "avg": 3.5
+                }
+              }
+            }
+          }
+        ],
+        "initially_published_at": null,
+        "can_write": true,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 2,
+        "query_type": "native",
+        "name": "T\u1ef7 l\u1ec7 giao d\u1ecbch gian l\u1eadn (%)",
+        "type": "question",
+        "query_average_duration": 337,
+        "creator_id": 1,
+        "moderation_reviews": [],
+        "updated_at": "2026-10-09T15:48:30.379781Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "type": "native",
+          "database": 2,
+          "native": {
+            "query": "SELECT ROUND(100.0 * COUNT(*) FILTER (WHERE is_fraud = 1) / NULLIF(COUNT(*), 0), 2) AS fraud_rate_pct FROM marts.fact_transactions;"
+          }
+        },
+        "id": 3,
+        "parameter_mappings": [],
+        "display": "scalar",
+        "entity_id": "mPOqMoZTs7tejbsn8_lnk",
+        "collection_preview": true,
+        "visualization_settings": {},
+        "metabase_version": "v0.49.0 (46c668b)",
+        "parameters": [],
+        "dataset": false,
+        "created_at": "2026-10-09T15:39:28.633266Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-10-09T15:40:51.514774Z",
+      "col": 6,
+      "id": 3,
+      "parameter_mappings": [],
+      "card_id": 3,
+      "entity_id": "oeM-O0VG0piCKMQpVNCVf",
+      "visualization_settings": {},
+      "size_y": 2,
+      "dashboard_id": 1,
+      "created_at": "2026-10-09T15:40:51.514774Z",
+      "row": 0
+    },
+    {
+      "size_x": 3,
+      "dashboard_tab_id": null,
+      "series": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "description": "KPI: s\u1ed1 giao d\u1ecbch c\u00f3 nh\u00e3n th\u1ef1c t\u1ebf is_fraud = 1",
+        "archived": false,
+        "collection_position": null,
+        "table_id": null,
+        "result_metadata": [
+          {
+            "display_name": "total_fraud_transactions",
+            "field_ref": [
+              "field",
+              "total_fraud_transactions",
+              {
+                "base-type": "type/BigInteger"
+              }
+            ],
+            "name": "total_fraud_transactions",
+            "base_type": "type/BigInteger",
+            "effective_type": "type/BigInteger",
+            "semantic_type": null,
+            "fingerprint": {
+              "global": {
+                "distinct-count": 1,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "min": 20663.0,
+                  "q1": 20663.0,
+                  "q3": 20663.0,
+                  "max": 20663.0,
+                  "sd": null,
+                  "avg": 20663.0
+                }
+              }
+            }
+          }
+        ],
+        "initially_published_at": null,
+        "can_write": true,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 2,
+        "query_type": "native",
+        "name": "T\u1ed5ng s\u1ed1 giao d\u1ecbch gian l\u1eadn",
+        "type": "question",
+        "query_average_duration": 354,
+        "creator_id": 1,
+        "moderation_reviews": [],
+        "updated_at": "2026-10-09T15:48:30.090456Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "type": "native",
+          "database": 2,
+          "native": {
+            "query": "SELECT COUNT(*) AS total_fraud_transactions FROM marts.fact_transactions WHERE is_fraud = 1;"
+          }
+        },
+        "id": 2,
+        "parameter_mappings": [],
+        "display": "scalar",
+        "entity_id": "2o9_VLIa83eqNrr04sAFa",
+        "collection_preview": true,
+        "visualization_settings": {},
+        "metabase_version": "v0.49.0 (46c668b)",
+        "parameters": [],
+        "dataset": false,
+        "created_at": "2026-10-09T15:39:27.995895Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-10-09T15:40:51.514774Z",
+      "col": 3,
+      "id": 2,
+      "parameter_mappings": [],
+      "card_id": 2,
+      "entity_id": "MVw-bS1261pP_kewjKGl-",
+      "visualization_settings": {},
+      "size_y": 2,
+      "dashboard_id": 1,
+      "created_at": "2026-10-09T15:40:51.514774Z",
+      "row": 0
+    },
+    {
+      "size_x": 3,
+      "dashboard_tab_id": null,
+      "series": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "description": "KPI: t\u1ed5ng c\u1ed9t transaction_amt c\u1ee7a to\u00e0n b\u1ed9 giao d\u1ecbch",
+        "archived": false,
+        "collection_position": null,
+        "table_id": null,
+        "result_metadata": [
+          {
+            "display_name": "total_amount",
+            "field_ref": [
+              "field",
+              "total_amount",
+              {
+                "base-type": "type/Decimal"
+              }
+            ],
+            "name": "total_amount",
+            "base_type": "type/Decimal",
+            "effective_type": "type/Decimal",
+            "semantic_type": null,
+            "fingerprint": {
+              "global": {
+                "distinct-count": 1,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "min": 79738980.37,
+                  "q1": 79738980.37,
+                  "q3": 79738980.37,
+                  "max": 79738980.37,
+                  "sd": null,
+                  "avg": 79738980.37
+                }
+              }
+            }
+          }
+        ],
+        "initially_published_at": null,
+        "can_write": true,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 2,
+        "query_type": "native",
+        "name": "T\u1ed5ng gi\u00e1 tr\u1ecb giao d\u1ecbch",
+        "type": "question",
+        "query_average_duration": 357,
+        "creator_id": 1,
+        "moderation_reviews": [],
+        "updated_at": "2026-10-09T15:48:30.750198Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "type": "native",
+          "database": 2,
+          "native": {
+            "query": "SELECT SUM(transaction_amt) AS total_amount FROM marts.fact_transactions;"
+          }
+        },
+        "id": 4,
+        "parameter_mappings": [],
+        "display": "scalar",
+        "entity_id": "GQl28LIwFrVI2PHr9rnxW",
+        "collection_preview": true,
+        "visualization_settings": {},
+        "metabase_version": "v0.49.0 (46c668b)",
+        "parameters": [],
+        "dataset": false,
+        "created_at": "2026-10-09T15:39:29.310231Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-10-09T15:40:51.514774Z",
+      "col": 9,
+      "id": 4,
+      "parameter_mappings": [],
+      "card_id": 4,
+      "entity_id": "K4ljlmEX6RjJi3A6KGiEb",
+      "visualization_settings": {},
+      "size_y": 2,
+      "dashboard_id": 1,
+      "created_at": "2026-10-09T15:40:51.514774Z",
+      "row": 0
+    },
+    {
+      "size_x": 3,
+      "dashboard_tab_id": null,
+      "series": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "description": "KPI: t\u1ed5ng s\u1ed1 giao d\u1ecbch trong marts.fact_transactions",
+        "archived": false,
+        "collection_position": null,
+        "table_id": null,
+        "result_metadata": [
+          {
+            "display_name": "total_transactions",
+            "field_ref": [
+              "field",
+              "total_transactions",
+              {
+                "base-type": "type/BigInteger"
+              }
+            ],
+            "name": "total_transactions",
+            "base_type": "type/BigInteger",
+            "effective_type": "type/BigInteger",
+            "semantic_type": null,
+            "fingerprint": {
+              "global": {
+                "distinct-count": 1,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "min": 590540.0,
+                  "q1": 590540.0,
+                  "q3": 590540.0,
+                  "max": 590540.0,
+                  "sd": null,
+                  "avg": 590540.0
+                }
+              }
+            }
+          }
+        ],
+        "initially_published_at": null,
+        "can_write": true,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 2,
+        "query_type": "native",
+        "name": "T\u1ed5ng s\u1ed1 giao d\u1ecbch",
+        "type": "question",
+        "query_average_duration": 406,
+        "creator_id": 1,
+        "moderation_reviews": [],
+        "updated_at": "2026-10-09T15:48:29.709976Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "type": "native",
+          "database": 2,
+          "native": {
+            "query": "SELECT COUNT(*) AS total_transactions FROM marts.fact_transactions;"
+          }
+        },
+        "id": 1,
+        "parameter_mappings": [],
+        "display": "scalar",
+        "entity_id": "x9ETfYdW1mqdG9PqNfC6X",
+        "collection_preview": true,
+        "visualization_settings": {},
+        "metabase_version": "v0.49.0 (46c668b)",
+        "parameters": [],
+        "dataset": false,
+        "created_at": "2026-10-09T15:36:24.697074Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-10-09T15:40:51.514774Z",
+      "col": 0,
+      "id": 1,
+      "parameter_mappings": [],
+      "card_id": 1,
+      "entity_id": "Vd2ofMkE2dvg9LNR-yXbj",
+      "visualization_settings": {},
+      "size_y": 2,
+      "dashboard_id": 1,
+      "created_at": "2026-10-09T15:40:51.514774Z",
+      "row": 0
+    },
+    {
+      "size_x": 12,
+      "dashboard_tab_id": null,
+      "series": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "description": "50 giao d\u1ecbch c\u00f3 x\u00e1c su\u1ea5t gian l\u1eadn cao nh\u1ea5t t\u1eeb marts.predictions (model_version='xgboost-v1-phase16'). \u0110\u00e2y l\u00e0 d\u1ef1 \u0111o\u00e1n c\u1ee7a m\u00f4 h\u00ecnh, kh\u00f4ng ph\u1ea3i k\u1ebft lu\u1eadn \u0111i\u1ec1u tra.",
+        "archived": false,
+        "collection_position": null,
+        "table_id": null,
+        "result_metadata": [
+          {
+            "display_name": "transaction_id",
+            "field_ref": [
+              "field",
+              "transaction_id",
+              {
+                "base-type": "type/BigInteger"
+              }
+            ],
+            "name": "transaction_id",
+            "base_type": "type/BigInteger",
+            "effective_type": "type/BigInteger",
+            "semantic_type": null,
+            "fingerprint": {
+              "global": {
+                "distinct-count": 50,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "min": 3001787.0,
+                  "q1": 3184423.0,
+                  "q3": 3459909.0,
+                  "max": 3570932.0,
+                  "sd": 167639.6578969478,
+                  "avg": 3304189.52
+                }
+              }
+            }
+          },
+          {
+            "display_name": "is_fraud_actual",
+            "field_ref": [
+              "field",
+              "is_fraud_actual",
+              {
+                "base-type": "type/Integer"
+              }
+            ],
+            "name": "is_fraud_actual",
+            "base_type": "type/Integer",
+            "effective_type": "type/Integer",
+            "semantic_type": null,
+            "fingerprint": {
+              "global": {
+                "distinct-count": 1,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "min": 1.0,
+                  "q1": 1.0,
+                  "q3": 1.0,
+                  "max": 1.0,
+                  "sd": 0.0,
+                  "avg": 1.0
+                }
+              }
+            }
+          },
+          {
+            "display_name": "is_fraud_predicted",
+            "field_ref": [
+              "field",
+              "is_fraud_predicted",
+              {
+                "base-type": "type/Integer"
+              }
+            ],
+            "name": "is_fraud_predicted",
+            "base_type": "type/Integer",
+            "effective_type": "type/Integer",
+            "semantic_type": null,
+            "fingerprint": {
+              "global": {
+                "distinct-count": 1,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "min": 1.0,
+                  "q1": 1.0,
+                  "q3": 1.0,
+                  "max": 1.0,
+                  "sd": 0.0,
+                  "avg": 1.0
+                }
+              }
+            }
+          },
+          {
+            "display_name": "fraud_probability_pct",
+            "field_ref": [
+              "field",
+              "fraud_probability_pct",
+              {
+                "base-type": "type/Decimal"
+              }
+            ],
+            "name": "fraud_probability_pct",
+            "base_type": "type/Decimal",
+            "effective_type": "type/Decimal",
+            "semantic_type": null,
+            "fingerprint": {
+              "global": {
+                "distinct-count": 20,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "min": 99.47,
+                  "q1": 99.51,
+                  "q3": 99.64,
+                  "max": 99.82,
+                  "sd": 0.08087001411940906,
+                  "avg": 99.5822
+                }
+              }
+            }
+          },
+          {
+            "display_name": "transaction_amt",
+            "field_ref": [
+              "field",
+              "transaction_amt",
+              {
+                "base-type": "type/Decimal"
+              }
+            ],
+            "name": "transaction_amt",
+            "base_type": "type/Decimal",
+            "effective_type": "type/Decimal",
+            "semantic_type": null,
+            "fingerprint": {
+              "global": {
+                "distinct-count": 38,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "min": 10.39,
+                  "q1": 30.95,
+                  "q3": 156.5741454089335,
+                  "max": 2259.95,
+                  "sd": 323.3363513085886,
+                  "avg": 148.908
+                }
+              }
+            }
+          }
+        ],
+        "initially_published_at": null,
+        "can_write": true,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 2,
+        "query_type": "native",
+        "name": "Top 50 d\u1ef1 \u0111o\u00e1n gian l\u1eadn",
+        "type": "question",
+        "query_average_duration": 382,
+        "creator_id": 1,
+        "moderation_reviews": [],
+        "updated_at": "2026-10-09T15:48:32.865422Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "type": "native",
+          "database": 2,
+          "native": {
+            "query": "SELECT p.transaction_id, p.is_fraud_actual, p.is_fraud_predicted, ROUND((p.fraud_probability * 100)::numeric, 2) AS fraud_probability_pct, f.transaction_amt FROM marts.predictions p JOIN marts.fact_transactions f ON f.transaction_id = p.transaction_id WHERE p.model_version = 'xgboost-v1-phase16' ORDER BY p.fraud_probability DESC LIMIT 50;"
+          }
+        },
+        "id": 8,
+        "parameter_mappings": [],
+        "display": "table",
+        "entity_id": "KlXscqZLAAwawOiyNgb4b",
+        "collection_preview": true,
+        "visualization_settings": {},
+        "metabase_version": "v0.49.0 (46c668b)",
+        "parameters": [],
+        "dataset": false,
+        "created_at": "2026-10-09T15:39:31.702767Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-10-09T15:42:26.839461Z",
+      "col": 0,
+      "id": 8,
+      "parameter_mappings": [],
+      "card_id": 8,
+      "entity_id": "tEBwrcBvmArfIKIasUHkp",
+      "visualization_settings": {},
+      "size_y": 8,
+      "dashboard_id": 1,
+      "created_at": "2026-10-09T15:42:26.839461Z",
+      "row": 12
+    },
+    {
+      "size_x": 12,
+      "dashboard_tab_id": null,
+      "series": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "description": "T\u1ef7 l\u1ec7 gian l\u1eadn theo ng\u00e0y giao d\u1ecbch (transaction_dt l\u00e0 epoch t\u01b0\u01a1ng \u0111\u1ed1i c\u1ee7a dataset)",
+        "archived": false,
+        "collection_position": null,
+        "table_id": null,
+        "result_metadata": [
+          {
+            "display_name": "transaction_date",
+            "field_ref": [
+              "field",
+              "transaction_date",
+              {
+                "base-type": "type/Date"
+              }
+            ],
+            "name": "transaction_date",
+            "base_type": "type/Date",
+            "effective_type": "type/Date",
+            "semantic_type": null,
+            "fingerprint": {
+              "global": {
+                "distinct-count": 182,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/DateTime": {
+                  "earliest": "1970-01-02T00:00:00Z",
+                  "latest": "1970-07-02T00:00:00Z"
+                }
+              }
+            }
+          },
+          {
+            "display_name": "total_transactions",
+            "field_ref": [
+              "field",
+              "total_transactions",
+              {
+                "base-type": "type/BigInteger"
+              }
+            ],
+            "name": "total_transactions",
+            "base_type": "type/BigInteger",
+            "effective_type": "type/BigInteger",
+            "semantic_type": null,
+            "fingerprint": {
+              "global": {
+                "distinct-count": 173,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "min": 2048.0,
+                  "q1": 2783.9605734961688,
+                  "q3": 3409.9846922834954,
+                  "max": 6852.0,
+                  "sd": 827.1556327201239,
+                  "avg": 3244.7252747252746
+                }
+              }
+            }
+          },
+          {
+            "display_name": "fraud_transactions",
+            "field_ref": [
+              "field",
+              "fraud_transactions",
+              {
+                "base-type": "type/BigInteger"
+              }
+            ],
+            "name": "fraud_transactions",
+            "base_type": "type/BigInteger",
+            "effective_type": "type/BigInteger",
+            "semantic_type": null,
+            "fingerprint": {
+              "global": {
+                "distinct-count": 93,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "min": 51.0,
+                  "q1": 90.84877073952153,
+                  "q3": 132.1759546816668,
+                  "max": 234.0,
+                  "sd": 30.957367066313395,
+                  "avg": 113.53296703296704
+                }
+              }
+            }
+          },
+          {
+            "display_name": "fraud_rate_pct",
+            "field_ref": [
+              "field",
+              "fraud_rate_pct",
+              {
+                "base-type": "type/Decimal"
+              }
+            ],
+            "name": "fraud_rate_pct",
+            "base_type": "type/Decimal",
+            "effective_type": "type/Decimal",
+            "semantic_type": null,
+            "fingerprint": {
+              "global": {
+                "distinct-count": 139,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "min": 1.1,
+                  "q1": 2.863045464985176,
+                  "q3": 4.247087175426664,
+                  "max": 6.99,
+                  "sd": 0.998389606418679,
+                  "avg": 3.6047802197802192
+                }
+              }
+            }
+          }
+        ],
+        "initially_published_at": null,
+        "can_write": true,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 2,
+        "query_type": "native",
+        "name": "T\u1ef7 l\u1ec7 gian l\u1eadn theo ng\u00e0y",
+        "type": "question",
+        "query_average_duration": 630,
+        "creator_id": 1,
+        "moderation_reviews": [],
+        "updated_at": "2026-10-09T15:48:31.291321Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "type": "native",
+          "database": 2,
+          "native": {
+            "query": "SELECT to_timestamp(transaction_dt)::date AS transaction_date, COUNT(*) AS total_transactions, COUNT(*) FILTER (WHERE is_fraud = 1) AS fraud_transactions, ROUND(100.0 * COUNT(*) FILTER (WHERE is_fraud = 1) / NULLIF(COUNT(*), 0), 2) AS fraud_rate_pct FROM marts.fact_transactions GROUP BY transaction_date ORDER BY transaction_date;"
+          }
+        },
+        "id": 5,
+        "parameter_mappings": [],
+        "display": "line",
+        "entity_id": "GFjUyqOnY2Letyckn4GdT",
+        "collection_preview": true,
+        "visualization_settings": {},
+        "metabase_version": "v0.49.0 (46c668b)",
+        "parameters": [],
+        "dataset": false,
+        "created_at": "2026-10-09T15:39:30.067736Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-10-09T15:42:26.839461Z",
+      "col": 0,
+      "id": 5,
+      "parameter_mappings": [],
+      "card_id": 5,
+      "entity_id": "gBFvxmjD_2FFfpcqvWhY8",
+      "visualization_settings": {},
+      "size_y": 5,
+      "dashboard_id": 1,
+      "created_at": "2026-10-09T15:42:26.839461Z",
+      "row": 2
+    },
+    {
+      "size_x": 6,
+      "dashboard_tab_id": null,
+      "series": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "description": "T\u1ef7 l\u1ec7 gian l\u1eadn theo device_type (NULL gom v\u00e0o nh\u00f3m Unknown)",
+        "archived": false,
+        "collection_position": null,
+        "table_id": null,
+        "result_metadata": [
+          {
+            "display_name": "device_type",
+            "field_ref": [
+              "field",
+              "device_type",
+              {
+                "base-type": "type/Text"
+              }
+            ],
+            "name": "device_type",
+            "base_type": "type/Text",
+            "effective_type": "type/Text",
+            "semantic_type": "type/Category",
+            "fingerprint": {
+              "global": {
+                "distinct-count": 3,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Text": {
+                  "percent-json": 0.0,
+                  "percent-url": 0.0,
+                  "percent-email": 0.0,
+                  "percent-state": 0.0,
+                  "average-length": 6.666666666666667
+                }
+              }
+            }
+          },
+          {
+            "display_name": "total_transactions",
+            "field_ref": [
+              "field",
+              "total_transactions",
+              {
+                "base-type": "type/BigInteger"
+              }
+            ],
+            "name": "total_transactions",
+            "base_type": "type/BigInteger",
+            "effective_type": "type/BigInteger",
+            "semantic_type": null,
+            "fingerprint": {
+              "global": {
+                "distinct-count": 3,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "min": 55645.0,
+                  "q1": 63025.0,
+                  "q3": 358588.75,
+                  "max": 449730.0,
+                  "sd": 219500.21140840236,
+                  "avg": 196846.66666666666
+                }
+              }
+            }
+          },
+          {
+            "display_name": "fraud_transactions",
+            "field_ref": [
+              "field",
+              "fraud_transactions",
+              {
+                "base-type": "type/BigInteger"
+              }
+            ],
+            "name": "fraud_transactions",
+            "base_type": "type/BigInteger",
+            "effective_type": "type/BigInteger",
+            "semantic_type": null,
+            "fingerprint": {
+              "global": {
+                "distinct-count": 3,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "min": 5554.0,
+                  "q1": 5579.75,
+                  "q3": 8503.25,
+                  "max": 9452.0,
+                  "sd": 2221.374874561548,
+                  "avg": 6887.666666666667
+                }
+              }
+            }
+          },
+          {
+            "display_name": "fraud_rate_pct",
+            "field_ref": [
+              "field",
+              "fraud_rate_pct",
+              {
+                "base-type": "type/Decimal"
+              }
+            ],
+            "name": "fraud_rate_pct",
+            "base_type": "type/Decimal",
+            "effective_type": "type/Decimal",
+            "semantic_type": null,
+            "fingerprint": {
+              "global": {
+                "distinct-count": 3,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "min": 2.1,
+                  "q1": 3.205,
+                  "q3": 9.2575,
+                  "max": 10.17,
+                  "sd": 4.041117832151561,
+                  "avg": 6.263333333333333
+                }
+              }
+            }
+          }
+        ],
+        "initially_published_at": null,
+        "can_write": true,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 2,
+        "query_type": "native",
+        "name": "Gian l\u1eadn theo lo\u1ea1i thi\u1ebft b\u1ecb",
+        "type": "question",
+        "query_average_duration": 641,
+        "creator_id": 1,
+        "moderation_reviews": [],
+        "updated_at": "2026-10-09T15:48:32.138807Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "type": "native",
+          "database": 2,
+          "native": {
+            "query": "SELECT COALESCE(NULLIF(device_type, ''), 'Unknown') AS device_type, COUNT(*) AS total_transactions, COUNT(*) FILTER (WHERE is_fraud = 1) AS fraud_transactions, ROUND(100.0 * COUNT(*) FILTER (WHERE is_fraud = 1) / NULLIF(COUNT(*), 0), 2) AS fraud_rate_pct FROM marts.fact_transactions GROUP BY device_type ORDER BY fraud_rate_pct DESC;"
+          }
+        },
+        "id": 6,
+        "parameter_mappings": [],
+        "display": "bar",
+        "entity_id": "9mJT5otiTKf0EcxW36yYX",
+        "collection_preview": true,
+        "visualization_settings": {},
+        "metabase_version": "v0.49.0 (46c668b)",
+        "parameters": [],
+        "dataset": false,
+        "created_at": "2026-10-09T15:39:30.959987Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-10-09T15:42:26.839461Z",
+      "col": 0,
+      "id": 6,
+      "parameter_mappings": [],
+      "card_id": 6,
+      "entity_id": "FrWfE2QpY_zoFgWgi5mta",
+      "visualization_settings": {},
+      "size_y": 5,
+      "dashboard_id": 1,
+      "created_at": "2026-10-09T15:42:26.839461Z",
+      "row": 7
+    },
+    {
+      "size_x": 6,
+      "dashboard_tab_id": null,
+      "series": [],
+      "action_id": null,
+      "collection_authority_level": null,
+      "card": {
+        "description": "T\u1ef7 l\u1ec7 gian l\u1eadn theo product_cd (\u0111\u00e3 materialize trong fact_transactions)",
+        "archived": false,
+        "collection_position": null,
+        "table_id": null,
+        "result_metadata": [
+          {
+            "display_name": "product_cd",
+            "field_ref": [
+              "field",
+              "product_cd",
+              {
+                "base-type": "type/Text"
+              }
+            ],
+            "name": "product_cd",
+            "base_type": "type/Text",
+            "effective_type": "type/Text",
+            "semantic_type": null,
+            "fingerprint": {
+              "global": {
+                "distinct-count": 5,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Text": {
+                  "percent-json": 0.0,
+                  "percent-url": 0.0,
+                  "percent-email": 0.0,
+                  "percent-state": 0.0,
+                  "average-length": 1.0
+                }
+              }
+            }
+          },
+          {
+            "display_name": "total_transactions",
+            "field_ref": [
+              "field",
+              "total_transactions",
+              {
+                "base-type": "type/BigInteger"
+              }
+            ],
+            "name": "total_transactions",
+            "base_type": "type/BigInteger",
+            "effective_type": "type/BigInteger",
+            "semantic_type": null,
+            "fingerprint": {
+              "global": {
+                "distinct-count": 5,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "min": 11628.0,
+                  "q1": 27675.0,
+                  "q3": 161306.75,
+                  "max": 439670.0,
+                  "sd": 180903.33986828435,
+                  "avg": 118108.0
+                }
+              }
+            }
+          },
+          {
+            "display_name": "fraud_transactions",
+            "field_ref": [
+              "field",
+              "fraud_transactions",
+              {
+                "base-type": "type/BigInteger"
+              }
+            ],
+            "name": "fraud_transactions",
+            "base_type": "type/BigInteger",
+            "effective_type": "type/BigInteger",
+            "semantic_type": null,
+            "fingerprint": {
+              "global": {
+                "distinct-count": 5,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "min": 686.0,
+                  "q1": 1241.0,
+                  "q3": 8248.25,
+                  "max": 8969.0,
+                  "sd": 4005.017453145492,
+                  "avg": 4132.6
+                }
+              }
+            }
+          },
+          {
+            "display_name": "fraud_rate_pct",
+            "field_ref": [
+              "field",
+              "fraud_rate_pct",
+              {
+                "base-type": "type/Decimal"
+              }
+            ],
+            "name": "fraud_rate_pct",
+            "base_type": "type/Decimal",
+            "effective_type": "type/Decimal",
+            "semantic_type": null,
+            "fingerprint": {
+              "global": {
+                "distinct-count": 5,
+                "nil%": 0.0
+              },
+              "type": {
+                "type/Number": {
+                  "min": 2.04,
+                  "q1": 3.3449999999999998,
+                  "q3": 7.3475,
+                  "max": 11.69,
+                  "sd": 3.6690094030950644,
+                  "avg": 5.636
+                }
+              }
+            }
+          }
+        ],
+        "initially_published_at": null,
+        "can_write": true,
+        "database_id": 2,
+        "enable_embedding": false,
+        "collection_id": 2,
+        "query_type": "native",
+        "name": "Gian l\u1eadn theo m\u00e3 s\u1ea3n ph\u1ea9m",
+        "type": "question",
+        "query_average_duration": 364,
+        "creator_id": 1,
+        "moderation_reviews": [],
+        "updated_at": "2026-10-09T15:48:32.469166Z",
+        "made_public_by_id": null,
+        "embedding_params": null,
+        "cache_ttl": null,
+        "dataset_query": {
+          "type": "native",
+          "database": 2,
+          "native": {
+            "query": "SELECT product_cd, COUNT(*) AS total_transactions, COUNT(*) FILTER (WHERE is_fraud = 1) AS fraud_transactions, ROUND(100.0 * COUNT(*) FILTER (WHERE is_fraud = 1) / NULLIF(COUNT(*), 0), 2) AS fraud_rate_pct FROM marts.fact_transactions GROUP BY product_cd ORDER BY fraud_rate_pct DESC;"
+          }
+        },
+        "id": 7,
+        "parameter_mappings": [],
+        "display": "bar",
+        "entity_id": "_E3W88CRXm6YKEGQ9vsFt",
+        "collection_preview": true,
+        "visualization_settings": {},
+        "metabase_version": "v0.49.0 (46c668b)",
+        "parameters": [],
+        "dataset": false,
+        "created_at": "2026-10-09T15:39:31.488522Z",
+        "public_uuid": null
+      },
+      "updated_at": "2026-10-09T15:42:26.839461Z",
+      "col": 6,
+      "id": 7,
+      "parameter_mappings": [],
+      "card_id": 7,
+      "entity_id": "HA1R3d25Ht8JU0gUwbkUu",
+      "visualization_settings": {},
+      "size_y": 5,
+      "dashboard_id": 1,
+      "created_at": "2026-10-09T15:42:26.839461Z",
+      "row": 7
+    }
+  ],
+  "param_values": null,
+  "initially_published_at": null,
+  "can_write": true,
+  "tabs": [],
+  "enable_embedding": false,
+  "collection_id": 2,
+  "show_in_getting_started": false,
+  "name": "E-commerce Fraud Analytics",
+  "width": "fixed",
+  "caveats": null,
+  "collection_authority_level": null,
+  "creator_id": 1,
+  "updated_at": "2026-10-09T15:42:26.698331Z",
+  "made_public_by_id": null,
+  "embedding_params": null,
+  "cache_ttl": null,
+  "id": 1,
+  "position": null,
+  "entity_id": "xlG_UqAS46io8UQRNrVSJ",
+  "param_fields": null,
+  "last-edit-info": {
+    "id": 1,
+    "email": "admin@frauddw.local",
+    "first_name": "Fraud",
+    "last_name": "DW Admin",
+    "timestamp": "2026-10-09T15:54:40.302219Z"
+  },
+  "collection": {
+    "authority_level": null,
+    "description": "Fraud analytics questions (Phase 20)",
+    "archived": false,
+    "slug": "fraud_analytics",
+    "name": "Fraud Analytics",
+    "personal_owner_id": null,
+    "type": null,
+    "id": 2,
+    "entity_id": "t9j8G5mnrAt5E685CATtX",
+    "location": "/",
+    "namespace": null,
+    "is_personal": false,
+    "created_at": "2026-10-09T15:36:24.136134Z"
+  },
+  "parameters": [],
+  "auto_apply_filters": true,
+  "created_at": "2026-10-09T15:39:31.86056Z",
+  "public_uuid": null,
+  "points_of_interest": null
+}
