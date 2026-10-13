@@ -1,0 +1,10 @@
+marts.dim_date: 183
+marts.dim_product: 22
+marts.dim_device: 1,939
+staging.stg_transactions: 590,540
+orphan device_key: 0
+marts.fact_transactions is_fraud=1: 20,663
+null device_key: 471,919
+orphan product_key: 0
+marts.fact_transactions: 590,540
+null product_key: 1,577

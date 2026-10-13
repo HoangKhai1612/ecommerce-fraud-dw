@@ -1,0 +1,136 @@
+{
+  "pipeline": "ecommerce-fraud-dw end-to-end",
+  "started_at": "2026-10-13T14:06:01.815078+00:00",
+  "evidence_dir": "C:\\Users\\Administrator\\Documents\\ecommerce-fraud-dw\\evidence\\phase_24",
+  "steps": [
+    {
+      "step": "check_postgres",
+      "description": "PostgreSQL readiness (SELECT 1 on the DW)",
+      "status": "PASS",
+      "detail": "PostgreSQL answers SELECT 1",
+      "elapsed_seconds": 0.5,
+      "finished_at": "2026-10-13T14:06:01.815078+00:00",
+      "log": "evidence\\phase_24\\logs\\step_check_postgres.log"
+    },
+    {
+      "step": "ingestion",
+      "description": "CSV -> RAW ingestion (ingestion/load_raw.py)",
+      "status": "SKIPPED",
+      "detail": "source CSVs missing: C:\\Users\\Administrator\\Documents\\ecommerce-fraud-dw\\data\\raw\\train_transaction.csv, C:\\Users\\Administrator\\Documents\\ecommerce-fraud-dw\\data\\raw\\train_identity.csv",
+      "elapsed_seconds": 0.0,
+      "finished_at": "2026-10-13T14:06:01.815448+00:00",
+      "log": "evidence\\phase_24\\logs\\step_ingestion.log"
+    },
+    {
+      "step": "verify_raw",
+      "description": "Verify RAW tables exist with the expected row counts",
+      "status": "PASS",
+      "detail": "raw.identity: 144,233 rows; raw.transactions: 590,540 rows",
+      "elapsed_seconds": 0.5,
+      "finished_at": "2026-10-13T14:06:02.273014+00:00",
+      "log": "evidence\\phase_24\\logs\\step_verify_raw.log"
+    },
+    {
+      "step": "dbt_staging",
+      "description": "dbt staging models (view materialization, in Airflow container)",
+      "status": "PASS",
+      "detail": "dbt staging completed in 4s",
+      "elapsed_seconds": 4.1,
+      "finished_at": "2026-10-13T14:06:06.343019+00:00",
+      "log": "evidence\\phase_24\\logs\\step_dbt_staging.log"
+    },
+    {
+      "step": "dbt_marts",
+      "description": "dbt marts models (table materialization, in Airflow container)",
+      "status": "PASS",
+      "detail": "dbt marts completed in 86s",
+      "elapsed_seconds": 86.4,
+      "finished_at": "2026-10-13T14:07:32.758539+00:00",
+      "log": "evidence\\phase_24\\logs\\step_dbt_marts.log"
+    },
+    {
+      "step": "dbt_tests",
+      "description": "dbt data-quality tests (in Airflow container)",
+      "status": "PASS",
+      "detail": "dbt tests completed in 107s",
+      "elapsed_seconds": 107.2,
+      "finished_at": "2026-10-13T14:09:19.925150+00:00",
+      "log": "evidence\\phase_24\\logs\\step_dbt_tests.log"
+    },
+    {
+      "step": "verify_quality",
+      "description": "DW integrity: staging/fact row counts, fraud totals, dimension keys",
+      "status": "PASS",
+      "detail": "staging=fact=590,540; fraud=20,663 (3.499%); orphan keys=0; null product_key=1,577 (LEFT JOIN unmatched, informational)",
+      "elapsed_seconds": 2.3,
+      "finished_at": "2026-10-13T14:09:22.176884+00:00",
+      "log": "evidence\\phase_24\\logs\\step_verify_quality.log"
+    },
+    {
+      "step": "ml_train",
+      "description": "Train Logistic Regression, Random Forest, XGBoost (ml/train.py)",
+      "status": "PASS",
+      "detail": "trained Logistic Regression, Random Forest, XGBoost in 480s; n_features=1014; best=XGBoost",
+      "elapsed_seconds": 479.7,
+      "finished_at": "2026-10-13T14:17:21.917541+00:00",
+      "log": "evidence\\phase_24\\logs\\step_ml_train.log"
+    },
+    {
+      "step": "ml_evaluate",
+      "description": "Evaluate three models on held-out test set (ml/evaluate.py)",
+      "status": "PASS",
+      "detail": "evaluation completed in 8s; artifacts present",
+      "elapsed_seconds": 8.2,
+      "finished_at": "2026-10-13T14:17:30.133924+00:00",
+      "log": "evidence\\phase_24\\logs\\step_ml_evaluate.log"
+    },
+    {
+      "step": "ml_predict",
+      "description": "Batch prediction -> marts.predictions (ml/predict.py)",
+      "status": "PASS",
+      "detail": "prediction completed in 301s; marts.predictions rows=88,581",
+      "elapsed_seconds": 301.6,
+      "finished_at": "2026-10-13T14:22:31.722616+00:00",
+      "log": "evidence\\phase_24\\logs\\step_ml_predict.log"
+    },
+    {
+      "step": "ml_shap",
+      "description": "SHAP explanations (ml/shap_explain.py)",
+      "status": "PASS",
+      "detail": "SHAP completed in 10s; 5 PNGs + top_features.csv",
+      "elapsed_seconds": 9.7,
+      "finished_at": "2026-10-13T14:22:41.392685+00:00",
+      "log": "evidence\\phase_24\\logs\\step_ml_shap.log"
+    },
+    {
+      "step": "api_check",
+      "description": "FastAPI health/readiness/predict/transactions (running container)",
+      "status": "PASS",
+      "detail": "API /health /ready /predict /transactions all 200",
+      "elapsed_seconds": 4.5,
+      "finished_at": "2026-10-13T14:22:45.862563+00:00",
+      "log": "evidence\\phase_24\\logs\\step_api_check.log"
+    },
+    {
+      "step": "metabase_check",
+      "description": "Metabase health + application DB + DW connection registry",
+      "status": "PASS",
+      "detail": "Metabase healthy; DW connection registered in metabase_db",
+      "elapsed_seconds": 1.6,
+      "finished_at": "2026-10-13T14:22:47.427699+00:00",
+      "log": "evidence\\phase_24\\logs\\step_metabase_check.log"
+    },
+    {
+      "step": "airflow_check",
+      "description": "Airflow webserver health + DAG presence (no import errors)",
+      "status": "PASS",
+      "detail": "Airflow healthy; DAG fraud_dw_pipeline present",
+      "elapsed_seconds": 0.7,
+      "finished_at": "2026-10-13T14:22:48.084125+00:00",
+      "log": "evidence\\phase_24\\logs\\step_airflow_check.log"
+    }
+  ],
+  "passed": 13,
+  "skipped": 1,
+  "failed": 0
+}

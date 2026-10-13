@@ -1,0 +1,4 @@
+GET /health -> 200 {"status":"ok","service":"fraud-detection-api"}
+GET /ready -> 200 {"status":"ready","database":"ok"}
+POST /predict -> 200 is_fraud=0 fraud_probability=0.2585025727748871
+GET /transactions/3411796 -> 200 transaction_id=3411796

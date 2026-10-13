@@ -1,4 +1,3 @@
-
 """Ollama-backed LLM service."""
 
 from pathlib import Path

@@ -9,9 +9,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements and install dependencies
+# Copy requirements and install dependencies (system-wide so the
+# non-root appuser below can execute the installed console scripts)
 COPY requirements.txt .
-RUN pip install --user --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Production stage
 FROM python:3.11-slim
@@ -22,14 +23,6 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
     postgresql-client \
     && rm -rf /var/lib/apt/lists/*
-
-# Copy Python dependencies from builder
-COPY --from=builder /root/.local /root/.local
-
-# Add local pip bin to PATH
-ENV PATH=/root/.local/bin:$PATH \
-    PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1
 
 # Copy application code
 COPY . .

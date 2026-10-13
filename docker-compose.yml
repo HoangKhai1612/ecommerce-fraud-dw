@@ -1,7 +1,24 @@
-version: '3.8'
+# Phase 23 - Docker Compose for the E-commerce Fraud Data Warehouse project.
+#
+# Architecture (verified 2026-10-13):
+#   The authoritative Data Warehouse (ecommerce_fraud_dw with raw/staging/marts),
+#   the Airflow metadata database (airflow_db) and the Metabase application
+#   database (metabase_db) run on the Windows PostgreSQL 18 server
+#   (Windows service "postgresql-x64-18", automatic start).
+#   Containers reach it via host.docker.internal:5432.
+#
+#   The "postgres" service is the project's docker-local PostgreSQL instance,
+#   kept as an isolated secondary instance on host port 5434 (the authoritative
+#   server owns host port 5432). Its named volume "postgres_data" is preserved.
+#
+#   Ollama runs natively on the Windows host with the llama3 model already
+#   loaded; containers reach it via host.docker.internal:11434. An optional
+#   containerized Ollama is available behind the "optional-services" profile
+#   (stop the native Ollama service first if you enable it).
 
 services:
-  # PostgreSQL Database
+  # Docker-local PostgreSQL instance (secondary).
+  # The authoritative DW lives on the Windows PostgreSQL 18 server.
   postgres:
     image: postgres:15-alpine
     container_name: fraud_dw_postgres
@@ -11,9 +28,10 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: ${POSTGRES_DB:-ecommerce_fraud_dw}
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "${DOCKER_POSTGRES_PORT:-5434}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./docker/init_db.sh:/docker-entrypoint-initdb.d/init_db.sh:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-ecommerce_fraud_dw}"]
       interval: 10s
@@ -22,51 +40,61 @@ services:
     networks:
       - fraud_dw_network
 
-  # FastAPI Application
-  api:
+  # Airflow webserver + scheduler (LocalExecutor, single container).
+  # Metadata DB: airflow_db on the Windows PostgreSQL server.
+  # Warehouse connection: ecommerce_fraud_dw on the Windows PostgreSQL server.
+  airflow:
     build:
       context: .
-      dockerfile: Dockerfile
-    container_name: fraud_dw_api
+      dockerfile: Dockerfile.airflow
+    container_name: fraud_dw_airflow
     restart: unless-stopped
+    ports:
+      - "${AIRFLOW_PORT:-8080}:8080"
     environment:
-      API_HOST: 0.0.0.0
-      API_PORT: 8000
-      POSTGRES_HOST: postgres
-      POSTGRES_PORT: 5432
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD_URI}@host.docker.internal:5432/airflow_db
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__API__AUTH_BACKENDS: airflow.api.auth.backend.basic_auth
+      AIRFLOW_CONN_POSTGRES_DEFAULT: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD_URI}@host.docker.internal:5432/${POSTGRES_DB:-ecommerce_fraud_dw}
+      AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: "true"
+      POSTGRES_HOST: host.docker.internal
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: ${POSTGRES_DB:-ecommerce_fraud_dw}
-      LLM_PROVIDER: ${LLM_PROVIDER:-ollama}
-      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
-      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3}
-    ports:
-      - "${API_PORT:-8000}:8000"
-    depends_on:
-      postgres:
-        condition: service_healthy
+      DBT_POSTGRES_HOST: host.docker.internal
+      DBT_POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      DBT_POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      DBT_POSTGRES_DB: ${POSTGRES_DB:-ecommerce_fraud_dw}
     volumes:
-      - ./api:/app/api
-      - ./data:/app/data
-      - ./ml/saved_models:/app/ml/saved_models
-    networks:
-      - fraud_dw_network
+      - ./airflow/dags:/opt/airflow/dags
+      - ./airflow/logs:/opt/airflow/logs
+      - ./airflow/plugins:/opt/airflow/plugins
+      - ./airflow/config:/opt/airflow/config
+      - ./ingestion:/opt/airflow/ingestion
+      - ./dbt:/opt/airflow/dbt
+      - ./data:/opt/airflow/data
+    command: >
+      bash -c "
+        airflow db migrate &&
+        airflow users create --username ${AIRFLOW_ADMIN_USER:-admin} --password ${AIRFLOW_ADMIN_PASSWORD:-admin} --firstname Admin --lastname User --role Admin --email admin@example.com || true &&
+        airflow scheduler &
+        exec airflow webserver --port 8080
+      "
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8080/api/v1/health', timeout=5)\""]
       interval: 30s
       timeout: 10s
-      retries: 3
-      start_period: 5s
+      retries: 5
+      start_period: 40s
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - fraud_dw_network
 
-  # Metabase BI dashboard (Phase 20)
-  # - Application metadata is stored in the dedicated `metabase_db` database
-  #   on the Windows PostgreSQL instance (persistent, recommended setup) —
-  #   no local H2 file is used when MB_DB_* variables are set.
-  # - Metabase reaches PostgreSQL through host.docker.internal:5432, the same
-  #   pattern the airflow service uses. The reachable PostgreSQL instance is
-  #   the Windows PostgreSQL 18.3 server that hosts the full Data Warehouse
-  #   (ecommerce_fraud_dw with marts.*), NOT the `postgres` service container
-  #   (which holds a separate docker-local database).
+  # Metabase BI dashboard (Phase 20).
+  # Application metadata is stored in metabase_db on the Windows PostgreSQL
+  # server. Metabase queries the Data Warehouse on the same server.
   metabase:
     image: metabase/metabase:v0.49.0
     container_name: fraud_dw_metabase
@@ -75,46 +103,103 @@ services:
       MB_DB_TYPE: postgres
       MB_DB_DBNAME: metabase_db
       MB_DB_HOST: host.docker.internal
-      MB_DB_PORT: 5432
+      MB_DB_PORT: "5432"
       MB_DB_USER: ${POSTGRES_USER:-postgres}
       MB_DB_PASS: ${POSTGRES_PASSWORD:-postgres}
     ports:
       - "${METABASE_PORT:-3000}:3000"
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    depends_on:
-      postgres:
-        condition: service_healthy
     networks:
       - fraud_dw_network
 
-  # Optional: Ollama for local LLM (uncomment if using local LLM)
-  # ollama:
-  #   image: ollama/ollama:latest
-  #   container_name: fraud_dw_ollama
-  #   restart: unless-stopped
-  #   environment:
-  #     OLLAMA_NUM_GPU: 0  # Set to 1 if GPU available
-  #   ports:
-  #     - "11434:11434"
-  #   volumes:
-  #     - ollama_data:/root/.ollama
-  #   networks:
-  #     - fraud_dw_network
-
+  # ML FastAPI (Phase 21).
+  # Serves /health, /ready, /transactions/* and /predict using the
+  # XGBoost artifacts in ml/models/ (baked into the image).
   api:
     build:
       context: .
       dockerfile: api/Dockerfile
-    ports:
-      - "8000:8000"
-    environment:
-      DATABASE_URL: ${API_DATABASE_URL}
+    container_name: fraud_dw_api
     restart: unless-stopped
+    environment:
+      API_HOST: 0.0.0.0
+      API_PORT: "8000"
+      POSTGRES_HOST: host.docker.internal
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-ecommerce_fraud_dw}
+    ports:
+      - "${API_PORT:-8000}:8000"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=5)\""]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - fraud_dw_network
+
+  # AI Assistant (Phase 22) - read-only Text-to-SQL over marts schema.
+  # Database: ecommerce_fraud_dw via the read-only role ai_assistant_ro.
+  # LLM: native Ollama on the Windows host (llama3 model).
+  ai-assistant:
+    build:
+      context: .
+      dockerfile: ai_assistant/Dockerfile
+    container_name: fraud_dw_ai_assistant
+    restart: unless-stopped
+    environment:
+      AI_DB_HOST: host.docker.internal
+      AI_DB_PORT: "5432"
+      AI_DB_NAME: ${POSTGRES_DB:-ecommerce_fraud_dw}
+      AI_DB_USER: ${AI_DB_USER:-ai_assistant_ro}
+      AI_DB_PASSWORD: ${AI_DB_PASSWORD:-}
+      AI_ALLOWED_SCHEMAS: ${AI_ALLOWED_SCHEMAS:-marts}
+      OLLAMA_BASE_URL: http://host.docker.internal:11434
+      LLM_MODEL: ${LLM_MODEL:-llama3}
+    ports:
+      - "${AI_ASSISTANT_PORT:-8001}:8001"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8001/health', timeout=5)\""]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - fraud_dw_network
+
+  # Optional containerized Ollama (disabled by default).
+  # The project uses the native Ollama service on the Windows host, which
+  # already has the llama3 model loaded and is reachable at
+  # host.docker.internal:11434. Enable with:
+  #   docker compose --profile optional-services up -d ollama
+  # Only after stopping the native Ollama process (host port 11434 conflict),
+  # and note the model would need to be re-downloaded unless the host
+  # model store is mounted at /root/.ollama.
+  ollama:
+    image: ollama/ollama:latest
+    container_name: fraud_dw_ollama
+    profiles:
+      - optional-services
+    restart: unless-stopped
+    environment:
+      OLLAMA_NUM_GPU: "0"
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - fraud_dw_network
 
 volumes:
   postgres_data:
-  # ollama_data:
+  ollama_data:
 
 networks:
   fraud_dw_network:

@@ -1,0 +1,100 @@
+$ C:\Users\Administrator\Documents\ecommerce-fraud-dw\.venv\Scripts\python.exe C:\Users\Administrator\Documents\ecommerce-fraud-dw\ml\evaluate.py
+cwd: C:\Users\Administrator\Documents\ecommerce-fraud-dw
+started: 2026-10-13T14:17:21.918163+00:00
+
+Loading test data...
+Test samples : 88,581
+Features      : 1,014
+Fraud samples : 3,099
+Fraud rate    : 3.4985%
+
+============================================================
+Logistic Regression
+============================================================
+ROC-AUC : 0.872100
+PR-AUC  : 0.486336
+Precision: 0.820728
+Recall   : 0.283640
+F1       : 0.421583
+F1 Macro : 0.703820
+
+Confusion Matrix:
+[[85290   192]
+ [ 2220   879]]
+
+Classification Report:
+              precision    recall  f1-score   support
+
+   Non-Fraud       0.97      1.00      0.99     85482
+       Fraud       0.82      0.28      0.42      3099
+
+    accuracy                           0.97     88581
+   macro avg       0.90      0.64      0.70     88581
+weighted avg       0.97      0.97      0.97     88581
+
+
+============================================================
+Random Forest
+============================================================
+ROC-AUC : 0.915310
+PR-AUC  : 0.650867
+Precision: 0.944210
+Recall   : 0.360439
+F1       : 0.521719
+F1 Macro : 0.754936
+
+Confusion Matrix:
+[[85416    66]
+ [ 1982  1117]]
+
+Classification Report:
+              precision    recall  f1-score   support
+
+   Non-Fraud       0.98      1.00      0.99     85482
+       Fraud       0.94      0.36      0.52      3099
+
+    accuracy                           0.98     88581
+   macro avg       0.96      0.68      0.75     88581
+weighted avg       0.98      0.98      0.97     88581
+
+
+============================================================
+XGBoost
+============================================================
+ROC-AUC : 0.917245
+PR-AUC  : 0.600815
+Precision: 0.319582
+Recall   : 0.709906
+F1       : 0.440749
+F1 Macro : 0.703677
+
+Confusion Matrix:
+[[80798  4684]
+ [  899  2200]]
+
+Classification Report:
+              precision    recall  f1-score   support
+
+   Non-Fraud       0.99      0.95      0.97     85482
+       Fraud       0.32      0.71      0.44      3099
+
+    accuracy                           0.94     88581
+   macro avg       0.65      0.83      0.70     88581
+weighted avg       0.97      0.94      0.95     88581
+
+
+================================================================================
+MODEL COMPARISON
+================================================================================
+              model  roc_auc   pr_auc  precision   recall       f1  f1_macro
+            XGBoost 0.917245 0.600815   0.319582 0.709906 0.440749  0.703677
+      Random Forest 0.915310 0.650867   0.944210 0.360439 0.521719  0.754936
+Logistic Regression 0.872100 0.486336   0.820728 0.283640 0.421583  0.703820
+
+>>> BEST MODEL BY ROC-AUC: XGBoost (ROC-AUC = 0.917245)
+
+Saved: ml/models\evaluation_results.pkl
+Saved: ml/models\evaluation_summary.csv
+
+exit_code: 0
+elapsed: 8.2s

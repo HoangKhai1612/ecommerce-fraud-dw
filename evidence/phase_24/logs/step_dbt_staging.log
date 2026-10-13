@@ -1,0 +1,28 @@
+$ docker exec fraud_dw_airflow bash -c cd /opt/airflow/dbt && dbt run --select staging --profiles-dir .
+cwd: C:\Users\Administrator\Documents\ecommerce-fraud-dw
+started: 2026-10-13T14:06:02.273228+00:00
+
+[0m14:06:03  Running with dbt=1.8.2
+[0m14:06:03  Registered adapter: postgres=1.8.2
+[0m14:06:04  Found 6 models, 38 data tests, 1 operation, 2 sources, 429 macros
+[0m14:06:04  
+[0m14:06:04  
+[0m14:06:04  Running 1 on-run-start hook
+[0m14:06:04  1 of 1 START hook: ecommerce_fraud_dw.on-run-start.0 ........................... [RUN]
+[0m14:06:04  1 of 1 OK hook: ecommerce_fraud_dw.on-run-start.0 .............................. [[32mSELECT 1[0m in 0.00s]
+[0m14:06:04  
+[0m14:06:04  Concurrency: 4 threads (target='dev')
+[0m14:06:04  
+[0m14:06:04  1 of 2 START sql view model staging.stg_identity ............................... [RUN]
+[0m14:06:04  2 of 2 START sql view model staging.stg_transactions ........................... [RUN]
+[0m14:06:04  1 of 2 OK created sql view model staging.stg_identity .......................... [[32mCREATE VIEW[0m in 0.18s]
+[0m14:06:04  2 of 2 OK created sql view model staging.stg_transactions ...................... [[32mCREATE VIEW[0m in 0.18s]
+[0m14:06:05  
+[0m14:06:05  Finished running 2 view models, 1 project hook in 0 hours 0 minutes and 0.43 seconds (0.43s).
+[0m14:06:05  
+[0m14:06:05  [32mCompleted successfully[0m
+[0m14:06:05  
+[0m14:06:05  Done. PASS=2 WARN=0 ERROR=0 SKIP=0 TOTAL=2
+
+exit_code: 0
+elapsed: 4.1s

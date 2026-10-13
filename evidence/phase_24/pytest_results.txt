@@ -1,0 +1,42 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.14.0, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\Administrator\Documents\ecommerce-fraud-dw\.venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\Administrator\Documents\ecommerce-fraud-dw
+plugins: anyio-4.15.1, langsmith-0.14.8, cov-7.1.0
+collecting ... collected 33 items
+
+tests/test_end_to_end.py::TestInfrastructure::test_postgres_connects PASSED [  3%]
+tests/test_end_to_end.py::TestInfrastructure::test_required_database_and_schemas_exist PASSED [  6%]
+tests/test_end_to_end.py::TestInfrastructure::test_airflow_health PASSED [  9%]
+tests/test_end_to_end.py::TestInfrastructure::test_metabase_health PASSED [ 12%]
+tests/test_end_to_end.py::TestInfrastructure::test_ollama_api_reachable PASSED [ 15%]
+tests/test_end_to_end.py::TestIngestion::test_raw_tables_populated PASSED [ 18%]
+tests/test_end_to_end.py::TestIngestion::test_raw_primary_keys_unique PASSED [ 21%]
+tests/test_end_to_end.py::TestIngestion::test_ingestion_step_is_safely_gated PASSED [ 24%]
+tests/test_end_to_end.py::TestDbt::test_dbt_staging_model_row_count PASSED [ 27%]
+tests/test_end_to_end.py::TestDbt::test_dbt_marts_fact_and_dimensions PASSED [ 30%]
+tests/test_end_to_end.py::TestDbt::test_dbt_marts_foreign_keys_intact PASSED [ 33%]
+tests/test_end_to_end.py::TestDbt::test_dbt_tests_pass PASSED            [ 36%]
+tests/test_end_to_end.py::TestMachineLearning::test_three_model_artifacts_exist PASSED [ 39%]
+tests/test_end_to_end.py::TestMachineLearning::test_training_results_contain_three_models PASSED [ 42%]
+tests/test_end_to_end.py::TestMachineLearning::test_evaluation_artifacts_exist PASSED [ 45%]
+tests/test_end_to_end.py::TestPrediction::test_predictions_table_schema PASSED [ 48%]
+tests/test_end_to_end.py::TestPrediction::test_predictions_content_domain PASSED [ 51%]
+tests/test_end_to_end.py::TestPrediction::test_predictions_link_to_transactions PASSED [ 54%]
+tests/test_end_to_end.py::TestPrediction::test_batch_vs_online_prediction_consistent PASSED [ 57%]
+tests/test_end_to_end.py::TestShap::test_shap_artifacts_exist_and_are_pngs PASSED [ 60%]
+tests/test_end_to_end.py::TestFastAPI::test_api_health PASSED            [ 63%]
+tests/test_end_to_end.py::TestFastAPI::test_api_readiness PASSED         [ 66%]
+tests/test_end_to_end.py::TestFastAPI::test_api_predict_valid_request PASSED [ 69%]
+tests/test_end_to_end.py::TestFastAPI::test_api_predict_invalid_request_rejected PASSED [ 72%]
+tests/test_end_to_end.py::TestFastAPI::test_api_get_transaction PASSED   [ 75%]
+tests/test_end_to_end.py::TestFastAPI::test_api_top_predictions PASSED   [ 78%]
+tests/test_end_to_end.py::TestMetabase::test_metabase_health PASSED      [ 81%]
+tests/test_end_to_end.py::TestMetabase::test_metabase_application_database_has_dw_connection PASSED [ 84%]
+tests/test_end_to_end.py::TestMetabase::test_metabase_dw_tables_queryable PASSED [ 87%]
+tests/test_end_to_end.py::TestAirflow::test_dag_present_and_not_paused PASSED [ 90%]
+tests/test_end_to_end.py::TestAirflow::test_dag_has_no_import_errors PASSED [ 93%]
+tests/test_end_to_end.py::TestAirflow::test_dag_task_dependencies PASSED [ 96%]
+tests/test_end_to_end.py::TestFullPipeline::test_full_pipeline SKIPPED   [100%]
+
+======================= 32 passed, 1 skipped in 28.09s ========================

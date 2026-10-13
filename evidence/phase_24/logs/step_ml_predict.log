@@ -1,0 +1,87 @@
+$ C:\Users\Administrator\Documents\ecommerce-fraud-dw\.venv\Scripts\python.exe C:\Users\Administrator\Documents\ecommerce-fraud-dw\ml\predict.py
+cwd: C:\Users\Administrator\Documents\ecommerce-fraud-dw
+started: 2026-10-13T14:17:30.134258+00:00
+
+======================================================================
+PHASE 19 — MODEL INTEGRATION
+======================================================================
+Loading test data...
+Test rows    : 88,581
+Test columns : 1,015
+Features     : 1,014
+Loading XGBoost model...
+
+Actual fraud rate: 3.4985%
+Recovering transaction_id (replaying Phase 15 split)...
+Base fact rows: 590,540
+Replay split: train=413,378 val=88,581 test=88,581
+is_fraud verification: 88,581 / 88,581 rows match
+transaction_id recovered and verified: 88,581 distinct, 0 NULLs
+Running predictions...
+Predicted fraud rate (threshold=0.5): 7.7714%
+marts.predictions already exists with 88,581 rows
+Truncating explicitly before insert...
+Saving predictions to marts.predictions...
+
+=== SQL VERIFICATION ===
+Row count: 88,581
+NULL counts (prediction_id, transaction_id, model_version, is_fraud_actual, is_fraud_predicted, fraud_probability, threshold, predicted_at): (0, 0, 0, 0, 0, 0, 0, 0)
+Distinct prediction_id: 88,581
+Distinct transaction_id: 88,581
+Duplicate (transaction_id, model_version) pairs: 0
+fraud_probability range: [0.004984, 0.998232]
+
+actual | predicted | count | avg_probability
+  0    |     0     | 80,798 | 0.141395
+  0    |     1     | 4,684 | 0.639542
+  1    |     0     | 899 | 0.270944
+  1    |     1     | 2,200 | 0.838343
+
+Top 10 highest fraud_probability (model_version=xgboost-v1-phase16):
+transaction_id | actual | predicted | probability
+        3564559  |   1    |    1     | 0.9982
+        3568241  |   1    |    1     | 0.9971
+        3127417  |   1    |    1     | 0.9968
+        3250047  |   1    |    1     | 0.9968
+        3404045  |   1    |    1     | 0.9968
+        3135596  |   1    |    1     | 0.9967
+        3135602  |   1    |    1     | 0.9967
+        3397199  |   1    |    1     | 0.9967
+        3291896  |   1    |    1     | 0.9966
+        3540433  |   1    |    1     | 0.9966
+
+=== PREDICTION METRICS (computed from actual predictions) ===
+ROC-AUC : 0.917245
+PR-AUC  : 0.600815
+Precision: 0.319582
+Recall   : 0.709906
+F1       : 0.440749
+
+Confusion Matrix:
+[[80798  4684]
+ [  899  2200]]
+
+Classification Report:
+              precision    recall  f1-score   support
+
+   Non-Fraud       0.99      0.95      0.97     85482
+       Fraud       0.32      0.71      0.44      3099
+
+    accuracy                           0.94     88581
+   macro avg       0.65      0.83      0.70     88581
+weighted avg       0.97      0.94      0.95     88581
+
+
+Saved: C:\Users\Administrator\Documents\ecommerce-fraud-dw\ml\models\prediction_metrics.pkl
+Saved: C:\Users\Administrator\Documents\ecommerce-fraud-dw\ml\models\prediction_metrics.json
+
+======================================================================
+>>> Predictions saved to marts.predictions (88,581 rows)
+>>> Metrics saved to ml/models/prediction_metrics.pkl
+>>> transaction_id recovered from marts.fact_transactions and verified (88,581/88,581 is_fraud match)
+======================================================================
+
+exit_code: 0
+elapsed: 300.8s
+
+marts.predictions: rows=88,581 distinct_txn=88,581 prob_range=[0.004984, 0.998232]

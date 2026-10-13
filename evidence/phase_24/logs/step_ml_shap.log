@@ -1,0 +1,66 @@
+$ C:\Users\Administrator\Documents\ecommerce-fraud-dw\.venv\Scripts\python.exe C:\Users\Administrator\Documents\ecommerce-fraud-dw\ml\shap_explain.py
+cwd: C:\Users\Administrator\Documents\ecommerce-fraud-dw
+started: 2026-10-13T14:22:31.723292+00:00
+
+======================================================================
+PHASE 18 — SHAP / XAI
+======================================================================
+Loading test data...
+Test rows: 88,581
+SHAP sample size: 5,000
+Features: 1,014
+Loading XGBoost model...
+Creating SHAP TreeExplainer...
+Computing SHAP values...
+SHAP matrix: 5,000 samples × 1,014 features
+Generating SHAP summary plot...
+Saved: C:\Users\Administrator\Documents\ecommerce-fraud-dw\ml\models\shap_summary.png
+Generating SHAP bar plot...
+Saved: C:\Users\Administrator\Documents\ecommerce-fraud-dw\ml\models\shap_bar.png
+Generating individual explanations...
+Saved: C:\Users\Administrator\Documents\ecommerce-fraud-dw\ml\models\shap_individual_0.png
+Saved: C:\Users\Administrator\Documents\ecommerce-fraud-dw\ml\models\shap_individual_100.png
+Saved: C:\Users\Administrator\Documents\ecommerce-fraud-dw\ml\models\shap_individual_500.png
+Calculating feature importance...
+
+Top 20 features:
+                   feature  mean_abs_shap
+                  num__c14       0.186257
+      num__transaction_amt       0.176893
+                 num__v258       0.157891
+                   num__c1       0.150194
+                  num__v70       0.148455
+                  num__v48       0.121820
+         cat__card6_credit       0.119443
+           num__card1_freq       0.095237
+                 num__v294       0.094872
+                   num__d3       0.091954
+                 num__v308       0.091344
+                  num__c13       0.089610
+                  num__c11       0.089317
+                  num__v91       0.079044
+                   num__d2       0.071198
+                   num__c8       0.071144
+                  num__d15       0.067024
+num__transaction_day_index       0.063672
+                   num__c6       0.060987
+                   num__d4       0.058009
+
+Saved: C:\Users\Administrator\Documents\ecommerce-fraud-dw\ml\models\top_features.csv
+
+======================================================================
+PHASE 18 — SHAP EXPLANATION COMPLETE
+======================================================================
+
+Top 5 features:
+             feature  mean_abs_shap
+            num__c14       0.186257
+num__transaction_amt       0.176893
+           num__v258       0.157891
+             num__c1       0.150194
+            num__v70       0.148455
+
+exit_code: 0
+elapsed: 9.7s
+
+SHAP artifacts: shap_bar.png, shap_individual_0.png, shap_individual_100.png, shap_individual_500.png, shap_summary.png

@@ -1,4 +1,3 @@
-
 """FastAPI entry point for the AI Assistant."""
 
 import logging

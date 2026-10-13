@@ -1,0 +1,100 @@
+$ docker exec fraud_dw_airflow bash -c cd /opt/airflow/dbt && dbt test --profiles-dir .
+cwd: C:\Users\Administrator\Documents\ecommerce-fraud-dw
+started: 2026-10-13T14:07:32.758877+00:00
+
+[0m14:07:34  Running with dbt=1.8.2
+[0m14:07:34  Registered adapter: postgres=1.8.2
+[0m14:07:35  Found 6 models, 38 data tests, 1 operation, 2 sources, 429 macros
+[0m14:07:35  
+[0m14:07:35  
+[0m14:07:35  Running 1 on-run-start hook
+[0m14:07:35  1 of 1 START hook: ecommerce_fraud_dw.on-run-start.0 ........................... [RUN]
+[0m14:07:35  1 of 1 OK hook: ecommerce_fraud_dw.on-run-start.0 .............................. [[32mSELECT 1[0m in 0.03s]
+[0m14:07:35  
+[0m14:07:35  Concurrency: 4 threads (target='dev')
+[0m14:07:35  
+[0m14:07:35  1 of 38 START test accepted_values_fact_transactions_is_fraud__0__1 ............ [RUN]
+[0m14:07:35  2 of 38 START test accepted_values_stg_transactions_is_fraud__0__1 ............. [RUN]
+[0m14:07:35  3 of 38 START test device_type_completeness .................................... [RUN]
+[0m14:07:35  4 of 38 START test duplicate_transaction_ids ................................... [RUN]
+[0m14:07:35  3 of 38 PASS device_type_completeness .......................................... [[32mPASS[0m in 0.20s]
+[0m14:07:35  5 of 38 START test fact_staging_row_count ...................................... [RUN]
+[0m14:07:37  2 of 38 PASS accepted_values_stg_transactions_is_fraud__0__1 ................... [[32mPASS[0m in 2.09s]
+[0m14:07:37  6 of 38 START test fact_transactions_not_empty ................................. [RUN]
+[0m14:09:10  1 of 38 PASS accepted_values_fact_transactions_is_fraud__0__1 .................. [[32mPASS[0m in 94.61s]
+[0m14:09:10  5 of 38 PASS fact_staging_row_count ............................................ [[32mPASS[0m in 94.41s]
+[0m14:09:10  7 of 38 START test fraud_distribution_consistency .............................. [RUN]
+[0m14:09:10  6 of 38 PASS fact_transactions_not_empty ....................................... [[32mPASS[0m in 92.53s]
+[0m14:09:10  8 of 38 START test fraud_ratio_check ........................................... [RUN]
+[0m14:09:10  9 of 38 START test invalid_fraud_flag .......................................... [RUN]
+[0m14:09:10  4 of 38 PASS duplicate_transaction_ids ......................................... [[32mPASS[0m in 95.08s]
+[0m14:09:10  10 of 38 START test negative_transaction_amount ................................ [RUN]
+[0m14:09:11  9 of 38 PASS invalid_fraud_flag ................................................ [[32mPASS[0m in 1.13s]
+[0m14:09:11  8 of 38 PASS fraud_ratio_check ................................................. [[32mPASS[0m in 1.13s]
+[0m14:09:11  7 of 38 PASS fraud_distribution_consistency .................................... [[32mPASS[0m in 1.15s]
+[0m14:09:11  11 of 38 START test non_positive_transaction_amount ............................ [RUN]
+[0m14:09:11  12 of 38 START test not_null_dim_date_date_key ................................. [RUN]
+[0m14:09:11  13 of 38 START test not_null_dim_date_transaction_day .......................... [RUN]
+[0m14:09:11  10 of 38 PASS negative_transaction_amount ...................................... [[32mPASS[0m in 0.74s]
+[0m14:09:11  14 of 38 START test not_null_dim_device_device_key ............................. [RUN]
+[0m14:09:11  13 of 38 PASS not_null_dim_date_transaction_day ................................ [[32mPASS[0m in 0.20s]
+[0m14:09:11  12 of 38 PASS not_null_dim_date_date_key ....................................... [[32mPASS[0m in 0.21s]
+[0m14:09:11  14 of 38 PASS not_null_dim_device_device_key ................................... [[32mPASS[0m in 0.16s]
+[0m14:09:11  15 of 38 START test not_null_dim_device_device_type ............................ [RUN]
+[0m14:09:11  16 of 38 START test not_null_dim_product_product_cd ............................ [RUN]
+[0m14:09:11  17 of 38 START test not_null_dim_product_product_key ........................... [RUN]
+[0m14:09:11  15 of 38 PASS not_null_dim_device_device_type .................................. [[32mPASS[0m in 0.11s]
+[0m14:09:11  18 of 38 START test not_null_fact_transactions_is_fraud ........................ [RUN]
+[0m14:09:11  16 of 38 PASS not_null_dim_product_product_cd .................................. [[32mPASS[0m in 0.12s]
+[0m14:09:11  17 of 38 PASS not_null_dim_product_product_key ................................. [[32mPASS[0m in 0.12s]
+[0m14:09:11  19 of 38 START test not_null_fact_transactions_transaction_amt ................. [RUN]
+[0m14:09:11  20 of 38 START test not_null_fact_transactions_transaction_id .................. [RUN]
+[0m14:09:11  11 of 38 PASS non_positive_transaction_amount .................................. [[32mPASS[0m in 0.64s]
+[0m14:09:11  21 of 38 START test not_null_fact_transactions_transaction_key ................. [RUN]
+[0m14:09:12  18 of 38 PASS not_null_fact_transactions_is_fraud .............................. [[32mPASS[0m in 1.00s]
+[0m14:09:12  22 of 38 START test not_null_stg_identity_transaction_id ....................... [RUN]
+[0m14:09:12  20 of 38 PASS not_null_fact_transactions_transaction_id ........................ [[32mPASS[0m in 0.99s]
+[0m14:09:12  19 of 38 PASS not_null_fact_transactions_transaction_amt ....................... [[32mPASS[0m in 1.00s]
+[0m14:09:12  23 of 38 START test not_null_stg_transactions_is_fraud ......................... [RUN]
+[0m14:09:12  24 of 38 START test not_null_stg_transactions_product_cd ....................... [RUN]
+[0m14:09:12  21 of 38 PASS not_null_fact_transactions_transaction_key ....................... [[32mPASS[0m in 0.82s]
+[0m14:09:12  25 of 38 START test not_null_stg_transactions_transaction_amt .................. [RUN]
+[0m14:09:12  22 of 38 PASS not_null_stg_identity_transaction_id ............................. [[32mPASS[0m in 0.28s]
+[0m14:09:12  26 of 38 START test not_null_stg_transactions_transaction_id ................... [RUN]
+[0m14:09:14  23 of 38 PASS not_null_stg_transactions_is_fraud ............................... [[32mPASS[0m in 1.81s]
+[0m14:09:14  24 of 38 PASS not_null_stg_transactions_product_cd ............................. [[32mPASS[0m in 1.81s]
+[0m14:09:14  27 of 38 START test null_transaction_ids ....................................... [RUN]
+[0m14:09:14  28 of 38 START test orphan_transactions ........................................ [RUN]
+[0m14:09:14  25 of 38 PASS not_null_stg_transactions_transaction_amt ........................ [[32mPASS[0m in 1.74s]
+[0m14:09:14  29 of 38 START test relationships_fact_transactions_device_key__device_key__ref_dim_device_  [RUN]
+[0m14:09:14  26 of 38 PASS not_null_stg_transactions_transaction_id ......................... [[32mPASS[0m in 1.61s]
+[0m14:09:14  30 of 38 START test relationships_fact_transactions_product_key__product_key__ref_dim_product_  [RUN]
+[0m14:09:15  30 of 38 PASS relationships_fact_transactions_product_key__product_key__ref_dim_product_  [[32mPASS[0m in 0.59s]
+[0m14:09:15  31 of 38 START test relationships_stg_identity_transaction_id__transaction_id__ref_stg_transactions_  [RUN]
+[0m14:09:15  27 of 38 PASS null_transaction_ids ............................................. [[32mPASS[0m in 1.08s]
+[0m14:09:15  32 of 38 START test staging_transactions_not_empty ............................. [RUN]
+[0m14:09:15  29 of 38 PASS relationships_fact_transactions_device_key__device_key__ref_dim_device_  [[32mPASS[0m in 1.19s]
+[0m14:09:15  33 of 38 START test unique_dim_date_date_key ................................... [RUN]
+[0m14:09:15  33 of 38 PASS unique_dim_date_date_key ......................................... [[32mPASS[0m in 0.11s]
+[0m14:09:15  34 of 38 START test unique_dim_device_device_key ............................... [RUN]
+[0m14:09:15  28 of 38 PASS orphan_transactions .............................................. [[32mPASS[0m in 1.42s]
+[0m14:09:15  35 of 38 START test unique_dim_product_product_key ............................. [RUN]
+[0m14:09:15  34 of 38 PASS unique_dim_device_device_key ..................................... [[32mPASS[0m in 0.11s]
+[0m14:09:15  36 of 38 START test unique_fact_transactions_transaction_id .................... [RUN]
+[0m14:09:15  35 of 38 PASS unique_dim_product_product_key ................................... [[32mPASS[0m in 0.11s]
+[0m14:09:15  37 of 38 START test unique_fact_transactions_transaction_key ................... [RUN]
+[0m14:09:16  31 of 38 PASS relationships_stg_identity_transaction_id__transaction_id__ref_stg_transactions_  [[32mPASS[0m in 1.04s]
+[0m14:09:16  38 of 38 START test unique_stg_transactions_transaction_id ..................... [RUN]
+[0m14:09:16  32 of 38 PASS staging_transactions_not_empty ................................... [[32mPASS[0m in 0.84s]
+[0m14:09:17  38 of 38 PASS unique_stg_transactions_transaction_id ........................... [[32mPASS[0m in 1.58s]
+[0m14:09:18  36 of 38 PASS unique_fact_transactions_transaction_id .......................... [[32mPASS[0m in 2.13s]
+[0m14:09:18  37 of 38 PASS unique_fact_transactions_transaction_key ......................... [[32mPASS[0m in 2.06s]
+[0m14:09:18  
+[0m14:09:18  Finished running 38 data tests, 1 project hook in 0 hours 1 minutes and 43.00 seconds (103.00s).
+[0m14:09:18  
+[0m14:09:18  [32mCompleted successfully[0m
+[0m14:09:18  
+[0m14:09:18  Done. PASS=38 WARN=0 ERROR=0 SKIP=0 TOTAL=38
+
+exit_code: 0
+elapsed: 107.2s

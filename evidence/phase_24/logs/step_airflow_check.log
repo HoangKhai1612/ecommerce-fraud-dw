@@ -1,0 +1,2 @@
+GET /api/v1/health -> 200 scheduler=healthy metadatabase=healthy
+GET /api/v1/dags -> 200 dag_ids=['fraud_dw_pipeline']

@@ -1,0 +1,32 @@
+$ docker exec fraud_dw_airflow bash -c cd /opt/airflow/dbt && dbt run --select marts --profiles-dir .
+cwd: C:\Users\Administrator\Documents\ecommerce-fraud-dw
+started: 2026-10-13T14:06:06.343490+00:00
+
+[0m14:06:07  Running with dbt=1.8.2
+[0m14:06:07  Registered adapter: postgres=1.8.2
+[0m14:06:08  Found 6 models, 38 data tests, 1 operation, 2 sources, 429 macros
+[0m14:06:08  
+[0m14:06:08  
+[0m14:06:08  Running 1 on-run-start hook
+[0m14:06:08  1 of 1 START hook: ecommerce_fraud_dw.on-run-start.0 ........................... [RUN]
+[0m14:06:08  1 of 1 OK hook: ecommerce_fraud_dw.on-run-start.0 .............................. [[32mSELECT 1[0m in 0.00s]
+[0m14:06:08  
+[0m14:06:08  Concurrency: 4 threads (target='dev')
+[0m14:06:08  
+[0m14:06:08  1 of 4 START sql table model marts.dim_date .................................... [RUN]
+[0m14:06:08  2 of 4 START sql table model marts.dim_device .................................. [RUN]
+[0m14:06:08  3 of 4 START sql table model marts.dim_product ................................. [RUN]
+[0m14:06:08  1 of 4 OK created sql table model marts.dim_date ............................... [[32mSELECT 183[0m in 0.18s]
+[0m14:06:09  2 of 4 OK created sql table model marts.dim_device ............................. [[32mSELECT 1939[0m in 0.30s]
+[0m14:06:09  3 of 4 OK created sql table model marts.dim_product ............................ [[32mSELECT 22[0m in 0.75s]
+[0m14:06:09  4 of 4 START sql table model marts.fact_transactions ........................... [RUN]
+[0m14:07:31  4 of 4 OK created sql table model marts.fact_transactions ...................... [[32mSELECT 590540[0m in 81.53s]
+[0m14:07:31  
+[0m14:07:31  Finished running 4 table models, 1 project hook in 0 hours 1 minutes and 22.55 seconds (82.55s).
+[0m14:07:31  
+[0m14:07:31  [32mCompleted successfully[0m
+[0m14:07:31  
+[0m14:07:31  Done. PASS=4 WARN=0 ERROR=0 SKIP=0 TOTAL=4
+
+exit_code: 0
+elapsed: 86.4s

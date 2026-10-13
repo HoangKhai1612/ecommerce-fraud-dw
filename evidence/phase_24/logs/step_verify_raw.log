@@ -1,0 +1,4 @@
+raw.identity: 144,233 rows
+raw.transactions: 590,540 rows
+raw.transactions: expected=590,540 actual=590,540 match=True
+raw.identity: expected=144,233 actual=144,233 match=True

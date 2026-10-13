@@ -1,0 +1,2 @@
+GET /api/health -> 200 {"status":"ok"}
+metabase_db.metabase_database contains ecommerce_fraud_dw: True

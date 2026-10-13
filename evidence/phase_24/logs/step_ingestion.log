@@ -1,0 +1,5 @@
+INGESTION SKIPPED — source CSV(s) not found:
+C:\Users\Administrator\Documents\ecommerce-fraud-dw\data\raw\train_transaction.csv
+C:\Users\Administrator\Documents\ecommerce-fraud-dw\data\raw\train_identity.csv
+
+ingestion/load_raw.py DROP+CREATEs raw.transactions and raw.identity, so running it without the CSVs would destroy the existing RAW data. The RAW tables are verified separately in step verify_raw.

@@ -46,3 +46,8 @@ report/
 profiles/
 dbt_packages/
 target/
+logs/
+.kilo/
+*.zip
+*.md
+!README.md

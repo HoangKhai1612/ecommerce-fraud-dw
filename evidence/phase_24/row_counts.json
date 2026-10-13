@@ -1,0 +1,20 @@
+{
+  "captured_at": "2026-10-13",
+  "database": "ecommerce_fraud_dw",
+  "row_counts": {
+    "raw.transactions": 590540,
+    "raw.identity": 144233,
+    "staging.stg_transactions": 590540,
+    "staging.stg_identity": 144233,
+    "marts.fact_transactions": 590540,
+    "marts.fact_transactions_fraud": 20663,
+    "marts.dim_product": 22,
+    "marts.dim_device": 1939,
+    "marts.dim_date": 183,
+    "marts.predictions": 88581,
+    "marts.predictions_fraud_predicted": 6884,
+    "marts.predictions_distinct_txn": 88581,
+    "marts.predictions_prob_min": 0.004983799532055855,
+    "marts.predictions_prob_max": 0.998231828212738
+  }
+}

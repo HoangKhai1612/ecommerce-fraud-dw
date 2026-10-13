@@ -1,4 +1,3 @@
-
 Bạn là AI Assistant của hệ thống Data Warehouse và phát hiện gian lận
 giao dịch thương mại điện tử.
 

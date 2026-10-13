@@ -1,0 +1,145 @@
+$ C:\Users\Administrator\Documents\ecommerce-fraud-dw\.venv\Scripts\python.exe C:\Users\Administrator\Documents\ecommerce-fraud-dw\ml\train.py
+cwd: C:\Users\Administrator\Documents\ecommerce-fraud-dw
+started: 2026-10-13T14:09:22.177726+00:00
+
+======================================================================
+PHASE 16 - MACHINE LEARNING
+======================================================================
+Loading training data...
+Loading validation data...
+Train shape: (413378, 1015)
+Validation shape: (88581, 1015)
+
+=== DATA VALIDATION ===
+Train rows: 413,378
+Validation rows: 88,581
+Train fraud rate: 0.034990
+Validation fraud rate: 0.034996
+
+Number of features: 1014
+
+Train feature NULL count: 0
+Validation feature NULL count: 0
+
+X_train: (413378, 1014)
+X_val:   (88581, 1014)
+
+======================================================================
+TRAINING LOGISTIC REGRESSION
+======================================================================
+Fitting 2 folds for each of 4 candidates, totalling 8 fits
+Best parameters:
+{'solver': 'lbfgs', 'penalty': 'l2', 'class_weight': None, 'C': 0.01}
+Best CV ROC-AUC: 0.844992
+
+======================================================================
+TRAINING RANDOM FOREST
+======================================================================
+Fitting 2 folds for each of 6 candidates, totalling 12 fits
+Best parameters:
+{'n_estimators': 200, 'min_samples_split': 2, 'min_samples_leaf': 2, 'max_features': 'sqrt', 'max_depth': 20, 'class_weight': None}
+Best CV ROC-AUC: 0.876630
+
+======================================================================
+TRAINING XGBOOST
+======================================================================
+Fitting 2 folds for each of 8 candidates, totalling 16 fits
+Best parameters:
+{'subsample': 0.8, 'scale_pos_weight': 15, 'reg_lambda': 0.5, 'reg_alpha': 0.1, 'n_estimators': 200, 'min_child_weight': 3, 'max_depth': 5, 'learning_rate': 0.05, 'colsample_bytree': 1.0}
+Best CV ROC-AUC: 0.891390
+
+
+
+======================================================================
+VALIDATION MODEL COMPARISON
+======================================================================
+
+----------------------------------------------------------------------
+VALIDATION: Logistic Regression
+----------------------------------------------------------------------
+ROC-AUC : 0.869964
+PR-AUC  : 0.485851
+Precision: 0.817424
+Recall   : 0.284516
+F1       : 0.422111
+
+Confusion Matrix:
+[[85284   197]
+ [ 2218   882]]
+
+Classification Report:
+              precision    recall  f1-score   support
+
+   Non-Fraud       0.97      1.00      0.99     85481
+       Fraud       0.82      0.28      0.42      3100
+
+    accuracy                           0.97     88581
+   macro avg       0.90      0.64      0.70     88581
+weighted avg       0.97      0.97      0.97     88581
+
+
+----------------------------------------------------------------------
+VALIDATION: Random Forest
+----------------------------------------------------------------------
+ROC-AUC : 0.912991
+PR-AUC  : 0.645182
+Precision: 0.925865
+Recall   : 0.362581
+F1       : 0.521094
+
+Confusion Matrix:
+[[85391    90]
+ [ 1976  1124]]
+
+Classification Report:
+              precision    recall  f1-score   support
+
+   Non-Fraud       0.98      1.00      0.99     85481
+       Fraud       0.93      0.36      0.52      3100
+
+    accuracy                           0.98     88581
+   macro avg       0.95      0.68      0.75     88581
+weighted avg       0.98      0.98      0.97     88581
+
+
+----------------------------------------------------------------------
+VALIDATION: XGBoost
+----------------------------------------------------------------------
+ROC-AUC : 0.916026
+PR-AUC  : 0.591256
+Precision: 0.316045
+Recall   : 0.713548
+F1       : 0.438063
+
+Confusion Matrix:
+[[80694  4787]
+ [  888  2212]]
+
+Classification Report:
+              precision    recall  f1-score   support
+
+   Non-Fraud       0.99      0.94      0.97     85481
+       Fraud       0.32      0.71      0.44      3100
+
+    accuracy                           0.94     88581
+   macro avg       0.65      0.83      0.70     88581
+weighted avg       0.97      0.94      0.95     88581
+
+
+======================================================================
+FINAL MODEL COMPARISON
+======================================================================
+Logistic Regression       ROC-AUC=0.869964 PR-AUC=0.485851 F1=0.422111
+Random Forest             ROC-AUC=0.912991 PR-AUC=0.645182 F1=0.521094
+XGBoost                   ROC-AUC=0.916026 PR-AUC=0.591256 F1=0.438063
+
+Best model:
+XGBoost
+
+Artifacts saved to:
+C:\Users\Administrator\Documents\ecommerce-fraud-dw\ml\models
+
+Phase 16 training completed.
+
+exit_code: 0
+elapsed: 479.7s
