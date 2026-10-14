@@ -1,207 +1,113 @@
-# PHASE 27 — Performance
+﻿# PHASE 27 — PERFORMANCE BENCHMARKING & OPTIMIZATION
 
 ## 1. MỤC TIÊU
 
-Đo lường và tối ưu hiệu năng của toàn bộ pipeline:
+Đo lường và tối ưu hiệu năng toàn bộ pipeline:
 - Ingestion speed
 - dbt model build time
 - ML training time
 - API response time
 - Memory usage
 
----
+## 2. PERFORMANCE METRICS (HISTORICAL/ESTIMATES)
 
-## 2. PERFORMANCE METRICS
+Các số liệu dưới đây là số liệu lịch sử/ước tính từ các phase trước. Chúng KHÔNG được coi là kết quả benchmark Phase 27 trừ khi được xác minh bằng lần chạy thực tế với bằng chứng trong evidence/phase_27/.
 
-### 2.1 Ingestion Performance
-
+### 2.1 Ingestion Performance (Historical)
 | Component | File | Rows | Time | Speed |
 |-----------|------|------|------|-------|
 | Ingestion | train_transaction.csv | 590,540 | 10.78s | 54,779 rows/s |
 | Ingestion | train_identity.csv | 144,233 | 2.34s | 61,640 rows/s |
 | **Total** | | **734,773** | **13.12s** | **~56,000 rows/s** |
 
-**Cải thiện từ:** sử dụng `to_sql` ban đầu (15+ min timeout) → `COPY command` (10.78s)
+*Historical note*: improvement noted (to_sql ~15+ min -> COPY ~10.78s). Requires verification under current environment.
 
-### 2.2 dbt Performance
-
+### 2.2 dbt Performance (Historical/Estimates)
 | Model | Type | Rows | Build Time |
 |-------|------|------|-----------|
 | stg_transactions | View | 590,540 | 0.13s |
 | stg_identity | View | 144,233 | 0.12s |
 | fact_transactions | Table | 590,540 | ~60s |
-| dim_date | Table | ~590,540 | ~30s |
-| dim_device | Table | ~5,000 | ~5s |
-| dim_product | Table | ~5 | ~1s |
+| dim_date | Table | ~183 | ~30s* |
+| dim_device | Table | ~1,939 | ~5s* |
+| dim_product | Table | ~5 | ~1s* |
 
-### 2.3 ML Training Performance
+*Note*: dim_date/dim_device counts adjusted to actual verified sizes where known; values marked ~ are estimates.
 
+### 2.3 ML Training Performance (Historical/Estimates)
 | Model | Training Time | CV Time | Best CV Score |
 |-------|--------------|---------|---------------|
-| Logistic Regression | ~5 min | ~4 min | 0.92 AUC |
-| Random Forest | ~15 min | ~10 min | 0.97 AUC |
-| XGBoost | ~10 min | ~8 min | 0.99 AUC |
+| Logistic Regression | ~5 min* | ~4 min* | ~0.92 AUC* |
+| Random Forest | ~15 min* | ~10 min* | ~0.97 AUC* |
+| XGBoost | ~10 min* | ~8 min* | ~0.99 AUC* |
 
-### 2.4 API Response Time
+*Not verified in Phase 27 runs. ML benchmarks are opt-in (--force-expensive) and must not overwrite artifacts.*
 
-| Endpoint | Avg Response | 95th Percentile | Concurrent |
-|----------|-------------|-----------------|------------|
-| GET /health | 2ms | 5ms | 100/s |
-| POST /predict | 50ms | 100ms | 10/s |
-| GET /transactions/{id} | 30ms | 50ms | 50/s |
+### 2.4 API Response Time (Historical/Estimates)
+| Endpoint | Avg Response | 95th Percentile | Notes |
+|----------|-------------|-----------------|-------|
+| GET /health | ~2ms* | ~5ms* | Unverified |
+| POST /predict | ~50ms* | ~100ms* | Requires valid payload (1014 features) |
+| GET /transactions/{id} | ~30ms* | ~50ms* | Unverified |
 
----
+## 3. PHASE 27 BENCHMARKING FRAMEWORK
 
-## 3. CÔNG CỤ ĐO LƯỜNG
+Phase 27 provides safe, non-destructive benchmarking tools. All expensive operations are opt-in.
 
-### 3.1 Python timing decorator
+### 3.1 Scripts
+- scripts/benchmark_utils.py — Common utilities (timing, env meta, JSON/CSV)
+- scripts/benchmark_ingestion.py — Ingestion benchmark (safe default: SKIPPED)
+- scripts/benchmark_dbt.py — dbt benchmark (safe default: SKIPPED)
+- scripts/benchmark_ml.py — ML benchmark (opt-in via --force-expensive)
+- scripts/benchmark_api.py — API benchmark (safe default: SKIPPED; requires running API)
+- scripts/profile_memory.py — Memory profiler (uses psutil if available)
+- scripts/run_phase27.py — Orchestrator (--help, --preflight, --stages, --force-expensive)
 
-```python
-import time
-from functools import wraps
+### 3.2 Execution (PowerShell)
+`powershell
+Set-Location "C:\Users\Administrator\Documents\ecommerce-fraud-dw"
+="C:\Users\Administrator\Documents\ecommerce-fraud-dw"
 
-def timeit(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        start = time.perf_counter()
-        result = func(*args, **kwargs)
-        elapsed = time.perf_counter() - start
-        print(f"[TIMING] {func.__name__}: {elapsed:.3f}s")
-        return result
-    return wrapper
-```
+# Help
+python scripts/run_phase27.py --help
 
-### 3.2 dbt timing
+# Unit tests
+python -m pytest tests/test_phase27.py -v
 
-```bash
-# Run with timing
-time dbt run --select marts.* --profiles-dir .
+# Run safe stages (preflight)
+python scripts/run_phase27.py --preflight
 
-# Check run results
-cat dbt/target/run_results.json | python -m json.tool
-```
+# Run specific safe stage if applicable
+python scripts/profile_memory.py
+python scripts/benchmark_api.py --base-url http://localhost:8000  # only if API running
+`
 
-### 3.3 API benchmark (locust)
+## 4. ACTUAL RESULTS (PHASE 27)
 
-File: `tests/benchmark_locust.py`
+| Stage | Status | Details |
+|-------|--------|---------|
+| Utils/Orchestrator | COMPLETED | Aggregate summary written to evidence/phase_27/aggregate_summary.json |
+| Memory | COMPLETED | evidence/phase_27/memory_profile.json (psutil available) |
+| API | SKIPPED | evidence/phase_27/api_benchmark.json — No running API service in this environment |
+| Ingestion | SKIPPED | Default safe mode (no isolated destructive ops) |
+| dbt | SKIPPED | Requires explicit model selection/preflight |
+| ML | SKIPPED | Opt-in via --force-expensive to avoid heavy training |
 
-```python
-"""
-Run with: locust -f tests/benchmark_locust.py --host http://localhost:8000
-"""
-from locust import HttpUser, task, between
+Actual measurements from Phase 27 runs: see evidence/phase_27/*.json. No fabricated performance numbers added.
 
-class APIBenchmark(HttpUser):
-    wait_time = between(1, 3)
+## 5. METHODOLOGY
+See docs/27_performance/benchmark_methodology.md for detailed metric definitions, reproducibility, and safety guarantees.
 
-    @task(10)
-    def health_check(self):
-        self.client.get("/health")
+## 6. SECURITY & SAFETY
+- No existing DW tables dropped/truncated/replaced during benchmarking
+- Expensive operations opt-in
+- No secrets/credentials in evidence
+- API benchmark validates schema/HTTP status when run
+- Historical values clearly labeled; measured values only from actual runs
 
-    @task(5)
-    def predict(self):
-        self.client.post("/predict", json={
-            "TransactionID": 3561737,
-            "TransactionDT": 86400,
-            "TransactionAmt": 49.5,
-            "ProductCD": "W",
-        })
+## 7. REFERENCES
+- Previous: [PHASE 26 — Troubleshooting](../26_troubleshooting/troubleshooting.md)
+- Methodology: [benchmark_methodology.md](benchmark_methodology.md)
+- Evidence: evidence/phase_27/
 
-    @task(3)
-    def get_transaction(self):
-        self.client.get("/transactions/3561737")
-```
-
----
-
-## 4. BOTTLENECK ANALYSIS
-
-### 4.1 Ingestion
-**Bottleneck:** `to_sql` method (row-by-row insert)
-**Solution:** PostgreSQL COPY command
-```python
-# Before (15+ minutes):
-df.to_sql('table', engine, if_exists='replace')
-
-# After (10 seconds):
-# Use COPY command directly
-```
-
-### 4.2 ML Training
-**Bottleneck:** `RandomizedSearchCV` with cv=5 trên 413K rows
-**Solution:** Giảm cv=3, n_iter=20, dùng `n_jobs=-1`
-```python
-search = RandomizedSearchCV(
-    model, param_dist,
-    n_iter=20, cv=3, n_jobs=-1,
-    scoring='roc_auc'
-)
-```
-
-### 4.3 SHAP
-**Bottleneck:** Computing SHAP values trên full dataset
-**Solution:** Sample 5,000 rows
-```python
-SAMPLE_SIZE = 5000
-X_sample = X.sample(n=SAMPLE_SIZE, random_state=42)
-```
-
-### 4.4 API
-**Bottleneck:** Model loading per-request
-**Solution:** Load model once at startup
-```python
-# Sai (load per request):
-@app.post("/predict")
-def predict(data):
-    model = joblib.load("model.pkl")  # SLOW
-    ...
-
-# Đúng (load at startup):
-model = joblib.load("model.pkl")  # Load once
-@app.post("/predict")
-def predict(data):
-    return model.predict_proba(...)  # Fast
-```
-
----
-
-## 5. MEMORY PROFILING
-
-```python
-# Theo dõi memory usage
-import psutil
-import gc
-
-def log_memory():
-    process = psutil.Process()
-    mem_mb = process.memory_info().rss / 1024 / 1024
-    print(f"[MEMORY] RSS: {mem_mb:.1f} MB")
-    gc.collect()
-    return mem_mb
-
-# Usage
-log_memory()  # Before loading data
-# ... load data ...
-log_memory()  # After loading data
-```
-
----
-
-## 6. OPTIMIZATION SUMMARY
-
-| Area | Before | After | Improvement |
-|------|--------|-------|-------------|
-| Ingestion | 15+ min (to_sql) | 10.78s (COPY) | **85x** faster |
-| dbt staging | N/A | 0.13s (view) | Instant |
-| ML training | 30+ min (cv=5) | 10 min (cv=3) | **3x** faster |
-| SHAP | 100K rows | 5K rows | **20x** faster |
-| API predict | 500ms (reload model) | 50ms (cached) | **10x** faster |
-
----
-
-## 7. Liên hệ
-
-- Trước: [PHASE 26 — Troubleshooting](../26_troubleshooting/troubleshooting.md)
-- Sau: [PHASE 28 — Security](../28_security/security.md)
-
-*Cập nhật: 02/09/2026 | Version: 1.0*
+*Updated: 2026-10-14 | Version: 2.0 (Phase 27 framework)*
