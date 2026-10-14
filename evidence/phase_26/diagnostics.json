@@ -1,0 +1,77 @@
+[
+  {
+    "check": "Python version",
+    "status": "PASS",
+    "detail": "3.14.0"
+  },
+  {
+    "check": "TCP localhost:5432",
+    "status": "PASS",
+    "detail": "Connection accepted"
+  },
+  {
+    "check": "TCP localhost:8000",
+    "status": "WARN",
+    "detail": "[WinError 10061] No connection could be made because the target machine actively refused it"
+  },
+  {
+    "check": "TCP localhost:11434",
+    "status": "PASS",
+    "detail": "Connection accepted"
+  },
+  {
+    "check": "Environment file",
+    "status": "PASS",
+    "detail": "C:\\Users\\Administrator\\Documents\\ecommerce-fraud-dw\\.env"
+  },
+  {
+    "check": "dbt project",
+    "status": "PASS",
+    "detail": "C:\\Users\\Administrator\\Documents\\ecommerce-fraud-dw\\dbt\\dbt_project.yml"
+  },
+  {
+    "check": "XGBoost model",
+    "status": "PASS",
+    "detail": "C:\\Users\\Administrator\\Documents\\ecommerce-fraud-dw\\ml\\models\\xgboost.pkl"
+  },
+  {
+    "check": "Feature columns",
+    "status": "PASS",
+    "detail": "C:\\Users\\Administrator\\Documents\\ecommerce-fraud-dw\\ml\\models\\feature_columns.json"
+  },
+  {
+    "check": "Python package: pandas",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "Python package: sqlalchemy",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "Python package: psycopg",
+    "status": "WARN",
+    "detail": "No module named 'psycopg'"
+  },
+  {
+    "check": "Python package: xgboost",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "Python package: fastapi",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "Python package: sklearn",
+    "status": "PASS",
+    "detail": ""
+  },
+  {
+    "check": "PostgreSQL query",
+    "status": "FAIL",
+    "detail": "ModuleNotFoundError"
+  }
+]

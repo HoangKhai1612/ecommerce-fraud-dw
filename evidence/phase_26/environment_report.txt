@@ -1,0 +1,72 @@
+﻿PHASE 26 ENVIRONMENT DIAGNOSTICS
+Timestamp: 2026-10-14T13:23:31.7855358+07:00
+Computer: WIN-BBK71KORFLD
+
+--- Docker Compose services ---
+NAME                    IMAGE                             COMMAND                  SERVICE        CREATED        STATUS                 PORTS
+fraud_dw_ai_assistant   ecommerce-fraud-dw-ai-assistant   "uvicorn ai_assistan…"   ai-assistant   19 hours ago   Up 2 hours (healthy)   0.0.0.0:8001->8001/tcp, [::]:8001->8001/tcp
+fraud_dw_airflow        ecommerce-fraud-dw-airflow        "/usr/bin/dumb-init …"   airflow        19 hours ago   Up 2 hours (healthy)   0.0.0.0:8080->8080/tcp, [::]:8080->8080/tcp
+fraud_dw_api            ecommerce-fraud-dw-api            "uvicorn api.main:ap…"   api            16 hours ago   Up 2 hours (healthy)   0.0.0.0:8000->8000/tcp, [::]:8000->8000/tcp
+fraud_dw_metabase       metabase/metabase:v0.49.0         "/app/run_metabase.sh"   metabase       4 days ago     Up 2 hours             0.0.0.0:3000->3000/tcp, [::]:3000->3000/tcp
+fraud_dw_postgres       postgres:15-alpine                "docker-entrypoint.s…"   postgres       19 hours ago   Up 2 hours (healthy)   0.0.0.0:5434->5432/tcp, [::]:5434->5432/tcp
+
+
+--- Port checks ---
+PORT 5432 : LISTENING
+
+LocalAddress LocalPort OwningProcess
+------------ --------- -------------
+::                5432          8236
+0.0.0.0           5432          8236
+
+
+
+PORT 8000 : LISTENING
+
+LocalAddress LocalPort OwningProcess
+------------ --------- -------------
+::1               8000         21052
+::                8000         17644
+
+
+
+PORT 3000 : LISTENING
+
+LocalAddress LocalPort OwningProcess
+------------ --------- -------------
+::1               3000         21052
+::                3000         17644
+
+
+
+PORT 8080 : LISTENING
+
+LocalAddress LocalPort OwningProcess
+------------ --------- -------------
+::1               8080         21052
+::                8080         17644
+
+
+
+PORT 11434 : LISTENING
+
+LocalAddress LocalPort OwningProcess
+------------ --------- -------------
+127.0.0.1        11434         13160
+
+
+
+
+--- Required project files ---
+PASS: .env
+PASS: dbt\dbt_project.yml
+PASS: ml\models\xgboost.pkl
+PASS: ml\models\feature_columns.json
+
+--- Docker disk usage ---
+TYPE            TOTAL     ACTIVE    SIZE      RECLAIMABLE
+Images          13        9         11.21GB   3.583GB (31%)
+Containers      15        8         785.8MB   89.77MB (11%)
+Local Volumes   8         7         915.5MB   47.81MB (5%)
+Build Cache     111       0         10.69GB   3.398GB
+
