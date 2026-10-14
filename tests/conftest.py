@@ -1,24 +1,12 @@
-"""pytest configuration for Phase 24 end-to-end tests.
-
-Ensures the project root is on sys.path so tests can import
-project modules when run with:
-
-    .venv\\Scripts\\python.exe -m pytest tests -v
-
-Also registers the custom --run-pipeline option used by
-tests/test_end_to_end.py to opt in to the full pipeline
-execution (ML training included).
-"""
-
-import sys
-from pathlib import Path
-
+"""Shared pytest fixtures."""
 import pytest
+import os
+from sqlalchemy import create_engine, text
+from dotenv import load_dotenv
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+load_dotenv()
 
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
+DB_URL = os.getenv("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/ecommerce_fraud_dw")
 
 
 def pytest_addoption(parser):
@@ -26,6 +14,30 @@ def pytest_addoption(parser):
         "--run-pipeline",
         action="store_true",
         default=False,
-        help="Execute the full pipeline via run_pipeline.py "
-        "(long-running: ML training included).",
+        help="Run full pipeline test (requires all services)",
     )
+
+
+@pytest.fixture(scope="session")
+def engine():
+    """Database engine fixture."""
+    eng = create_engine(DB_URL)
+    yield eng
+    eng.dispose()
+
+
+@pytest.fixture
+def sample_transaction():
+    """Sample transaction data."""
+    return {
+        "TransactionID": 3561737,
+        "TransactionDT": 86400,
+        "TransactionAmt": 49.5,
+        "ProductCD": "W",
+        "card1": 567,
+        "card2": 100.0,
+        "card3": 200.0,
+        "card4": "Visa",
+        "card5": 134.0,
+        "card6": "credit",
+    }

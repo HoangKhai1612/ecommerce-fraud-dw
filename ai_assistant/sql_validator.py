@@ -79,6 +79,15 @@ def validate_sql(sql: str) -> tuple[bool, str]:
     for cte in tree.args.get("with_", []):
         cte_names.add(cte.alias_or_name)
 
+    # Also collect nested CTE names recursively
+    def collect_cte_names(cte):
+        for nested_cte in cte.args.get("with_", []):
+            cte_names.add(nested_cte.alias_or_name)
+            collect_cte_names(nested_cte)
+
+    for cte in tree.args.get("with_", []):
+        collect_cte_names(cte)
+
     for table in tables:
         # Skip CTE references (they don't have a schema)
         if table.name in cte_names:
@@ -95,6 +104,9 @@ def validate_sql(sql: str) -> tuple[bool, str]:
     def validate_cte(cte):
         cte_tables = list(cte.find_all(exp.Table))
         for table in cte_tables:
+            # Skip CTE references (they don't have a schema)
+            if table.name in cte_names:
+                continue
             schema = table.db
             if not schema or schema not in ALLOWED_SCHEMAS:
                 return False, "Bảng trong CTE thuộc schema không được phép."

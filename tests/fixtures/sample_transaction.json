@@ -1,0 +1,9 @@
+{
+  "transaction_id": 12345,
+  "transaction_dt": 86400,
+  "transaction_amt": 150.75,
+  "product_cd": "W",
+  "card1": 1001,
+  "card4": "visa",
+  "device_type": "mobile"
+}
