@@ -1,0 +1,5 @@
+{
+  "status": "SKIPPED",
+  "reason": "No running API service in this environment; use --base-url if available",
+  "endpoints": []
+}
