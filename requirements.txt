@@ -21,6 +21,7 @@ fastapi>=0.110.0
 uvicorn>=0.27.0
 pydantic>=2.5.0
 requests>=2.31.0
+slowapi>=0.1.9
 
 # AI Assistant & Text-to-SQL
 sqlparse>=0.4.4

@@ -1,7 +1,8 @@
 """Fraud prediction endpoint."""
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 
+from api.config import limiter
 from api.inference import InferencePipeline, get_inference_pipeline, MODEL_VERSION
 from api.models import PredictionResponse, TransactionRaw
 
@@ -22,8 +23,10 @@ def _risk_level(probability: float) -> str:
 
 
 @router.post("", response_model=PredictionResponse)
+@limiter.limit("10/minute")
 def predict_fraud(
-    request: TransactionRaw,
+    request: Request,
+    data: TransactionRaw,
     pipeline: InferencePipeline = Depends(get_inference_pipeline),
 ):
     """
@@ -49,7 +52,7 @@ def predict_fraud(
             )
 
     # Convert request to DataFrame
-    input_dict = request.model_dump()
+    input_dict = data.model_dump()
     transaction_id = input_dict.pop("transaction_id")
 
     # Create DataFrame with single row

@@ -20,6 +20,9 @@ BLOCKED_FUNCTIONS = {
     "LO_EXPORT",
 }
 
+# Maximum subquery depth to prevent resource exhaustion.
+MAX_SUBQUERY_DEPTH = 3
+
 ALLOWED_ROOT_TYPES = (exp.Select,)
 
 
@@ -120,6 +123,27 @@ def validate_sql(sql: str) -> tuple[bool, str]:
         if not valid:
             return False, err
 
+    # Validate subquery depth to prevent resource exhaustion
+    def check_subquery_depth(node, depth=0):
+        if depth > MAX_SUBQUERY_DEPTH:
+            return False
+        for child in node.iter_expressions():
+            if isinstance(child, exp.Subquery):
+                if not check_subquery_depth(child, depth + 1):
+                    return False
+            elif hasattr(child, 'iter_expressions'):
+                if not check_subquery_depth(child, depth):
+                    return False
+        return True
+
+    if not check_subquery_depth(tree):
+        return False, f"Độ sâu subquery vượt quá giới hạn cho phép ({MAX_SUBQUERY_DEPTH})."
+
+    # Reject comments that could be used for injection attempts
+    # SQLGlot strips comments during parsing, but we check the original SQL
+    if "--" in sql or "/*" in sql:
+        return False, "Comment không được phép trong truy vấn."
+
     # Apply a maximum row limit using the parsed syntax tree.
     existing_limit = tree.args.get("limit")
 
@@ -157,3 +181,52 @@ def make_readonly_query(sql: str) -> str:
         raise ValueError(result)
 
     return result
+
+
+def build_parameterized_query(template: str, params: dict) -> tuple[str, tuple]:
+    """
+    Build a parameterized query safely.
+
+    Args:
+        template: SQL template with %s placeholders for parameters
+        params: Dictionary of parameter values
+
+    Returns:
+        Tuple of (sql_string, params_tuple) for use with psycopg cursor.execute()
+
+    Example:
+        sql, params = build_parameterized_query(
+            "SELECT * FROM marts.fact_transactions WHERE transaction_id = %s LIMIT %s",
+            {"tx_id": 123, "limit": 10}
+        )
+        cursor.execute(sql, params)
+    """
+    # Replace placeholders with dummy values for validation
+    import re
+    placeholder_count = len(re.findall(r'%s', template))
+    if placeholder_count != len(params):
+        raise ValueError("Number of placeholders does not match number of parameters")
+
+    # Create a dummy SQL for validation by replacing %s with appropriate dummy values
+    # We need to be careful about context - for LIMIT we use a number, for WHERE we use a string/number
+    dummy_values = []
+    for i, (key, value) in enumerate(params.items()):
+        if isinstance(value, int):
+            dummy_values.append("1")
+        elif isinstance(value, float):
+            dummy_values.append("1.0")
+        else:
+            dummy_values.append("'dummy'")
+
+    # Replace placeholders sequentially
+    validation_sql = template
+    for dummy in dummy_values:
+        validation_sql = validation_sql.replace("%s", dummy, 1)
+
+    # Validate the template with dummy values
+    is_valid, normalized = validate_sql(validation_sql)
+    if not is_valid:
+        raise ValueError(f"Template validation failed: {normalized}")
+
+    param_values = tuple(params.values())
+    return normalized, param_values

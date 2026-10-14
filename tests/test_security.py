@@ -1,4 +1,4 @@
-"""Phase 25 — Security Tests.
+"""Phase 28 — Security Tests.
 
 Tests the AI Assistant SQL validation and security controls.
 Run from the project root:
@@ -19,7 +19,79 @@ import pytest
 # Add ai_assistant to path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "ai_assistant"))
 
-from ai_assistant.sql_validator import validate_sql
+from ai_assistant.sql_validator import validate_sql, build_parameterized_query
+
+
+@pytest.mark.parametrize(
+    "sql",
+    [
+        "DELETE FROM marts.fact_transactions",
+        "DROP TABLE marts.fact_transactions",
+        "UPDATE marts.fact_transactions SET transaction_id = 1",
+        "INSERT INTO marts.fact_transactions VALUES (1)",
+        "TRUNCATE TABLE marts.fact_transactions",
+        "ALTER TABLE marts.fact_transactions ADD COLUMN x INT",
+        "CREATE TABLE marts.security_test (id INT)",
+    ],
+)
+def test_write_or_ddl_statements_are_rejected(sql):
+    is_valid, message = validate_sql(sql)
+
+    assert is_valid is False, (
+        f"SQL nguy hiểm đã được chấp nhận: {sql}; "
+        f"message={message}"
+    )
+
+
+@pytest.mark.parametrize(
+    "sql",
+    [
+        "SELECT * FROM pg_catalog.pg_authid",
+        "SELECT * FROM information_schema.tables",
+        "SELECT * FROM raw.transactions",
+        "SELECT * FROM staging.transactions",
+    ],
+)
+def test_disallowed_schema_is_rejected(sql):
+    is_valid, message = validate_sql(sql)
+
+    assert is_valid is False, (
+        f"SQL ngoài phạm vi marts đã được chấp nhận: {sql}; "
+        f"message={message}"
+    )
+
+
+@pytest.mark.parametrize(
+    "sql",
+    [
+        "SELECT transaction_id FROM marts.fact_transactions",
+        "SELECT COUNT(*) FROM marts.fact_transactions",
+        "SELECT * FROM marts.fact_transactions LIMIT 10",
+    ],
+)
+def test_safe_marts_select_is_accepted(sql):
+    is_valid, message = validate_sql(sql)
+
+    assert is_valid is True, (
+        f"SELECT hợp lệ bị từ chối: {sql}; message={message}"
+    )
+
+
+@pytest.mark.parametrize(
+    "sql",
+    [
+        "SELECT 1; DROP TABLE marts.fact_transactions",
+        "SELECT * FROM marts.fact_transactions; SELECT 2",
+        "SELECT * FROM marts.fact_transactions -- comment",
+    ],
+)
+def test_multiple_statements_and_comment_policy(sql):
+    is_valid, message = validate_sql(sql)
+
+    assert is_valid is False, (
+        f"SQL vi phạm chính sách đã được chấp nhận: {sql}; "
+        f"message={message}"
+    )
 
 
 class TestSQLValidatorBasic:
@@ -253,10 +325,8 @@ class TestSQLValidatorSQLInjectionPatterns:
         valid, msg = validate_sql(
             "SELECT * FROM marts.fact_transactions WHERE transaction_id = 1 -- OR 1=1"
         )
-        # Single statement with comment is parsed as SELECT, but LIMIT is added
-        # The comment is stripped by sqlglot, so this may pass
-        # This is acceptable behavior - the validator normalizes the query
-        assert valid or not valid  # Either is acceptable
+        # Comment is stripped by sqlglot, but our policy rejects comments
+        assert not valid
 
     def test_reject_always_true_condition(self):
         valid, sql = validate_sql(
@@ -270,3 +340,55 @@ class TestSQLValidatorSQLInjectionPatterns:
         )
         # Subqueries in WHERE are allowed if they reference allowed schemas
         assert valid or not valid  # Depends on implementation
+
+
+class TestSQLValidatorSubqueryDepth:
+    """Tests for subquery depth limiting."""
+
+    def test_allow_shallow_subquery(self):
+        valid, sql = validate_sql(
+            "SELECT * FROM marts.fact_transactions WHERE transaction_id IN "
+            "(SELECT transaction_id FROM marts.fact_transactions WHERE is_fraud = 1)"
+        )
+        assert valid
+
+    def test_reject_deep_nested_subquery(self):
+        # 5 levels deep (exceeds MAX_SUBQUERY_DEPTH = 3)
+        # Depths detected: 0, 1, 2, 3 (4 subqueries) - level 3 exceeds limit
+        valid, msg = validate_sql(
+            "SELECT * FROM marts.fact_transactions WHERE transaction_id IN "
+            "(SELECT transaction_id FROM marts.fact_transactions WHERE transaction_id IN "
+            "(SELECT transaction_id FROM marts.fact_transactions WHERE transaction_id IN "
+            "(SELECT transaction_id FROM marts.fact_transactions WHERE transaction_id IN "
+            "(SELECT transaction_id FROM marts.fact_transactions WHERE is_fraud = 1))))"
+        )
+        assert not valid
+
+
+class TestParameterizedQueries:
+    """Tests for parameterized query building."""
+
+    def test_build_parameterized_query_valid(self):
+        template = "SELECT * FROM marts.fact_transactions WHERE transaction_id = %s LIMIT %s"
+        params = {"tx_id": 123, "limit": 10}
+        sql, param_values = build_parameterized_query(template, params)
+        assert sql is not None
+        assert param_values == (123, 10)
+
+    def test_build_parameterized_query_mismatch(self):
+        template = "SELECT * FROM marts.fact_transactions WHERE transaction_id = %s"
+        params = {"tx_id": 123, "limit": 10}
+        try:
+            build_parameterized_query(template, params)
+            assert False, "Should have raised ValueError"
+        except ValueError as e:
+            assert "placeholders" in str(e).lower()
+
+    def test_build_parameterized_query_invalid_template(self):
+        template = "DELETE FROM marts.fact_transactions WHERE id = %s"
+        params = {"id": 1}
+        try:
+            build_parameterized_query(template, params)
+            assert False, "Should have raised ValueError"
+        except ValueError as e:
+            assert "validation failed" in str(e).lower()

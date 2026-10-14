@@ -4,8 +4,10 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from slowapi.errors import RateLimitExceeded
+from slowapi import _rate_limit_exceeded_handler
 
-from api.config import API_HOST, API_PORT
+from api.config import API_HOST, API_PORT, limiter
 from api.inference import load_inference_pipeline
 from api.routes import health, predict, transactions
 
@@ -37,6 +39,10 @@ app = FastAPI(
     redoc_url="/redoc",
     openapi_url="/openapi.json",
 )
+
+# Rate limiting
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # CORS - configure via environment in production
 app.add_middleware(

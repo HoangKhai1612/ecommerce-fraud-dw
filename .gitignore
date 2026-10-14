@@ -10,6 +10,14 @@ ENV/
 # Environment Variables
 .env
 .env.local
+.env.*
+!.env.example
+!.env.test.example
+
+# Secrets and environment files
+secrets/
+*.pem
+*.key
 
 # Data files (Do not commit large datasets)
 data/raw/*.csv
@@ -34,3 +42,12 @@ Thumbs.db
 # Airflow
 airflow/logs/
 airflow/airflow-worker.pid
+
+# Local databases and logs
+*.sqlite
+*.log
+*.pid
+
+# Security evidence containing secrets or sensitive records
+evidence/**/secrets*
+evidence/**/credentials*
