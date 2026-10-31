@@ -174,32 +174,54 @@ services:
     networks:
       - fraud_dw_network
 
-  # Optional containerized Ollama (disabled by default).
-  # The project uses the native Ollama service on the Windows host, which
-  # already has the llama3 model loaded and is reachable at
-  # host.docker.internal:11434. Enable with:
-  #   docker compose --profile optional-services up -d ollama
-  # Only after stopping the native Ollama process (host port 11434 conflict),
-  # and note the model would need to be re-downloaded unless the host
-  # model store is mounted at /root/.ollama.
-  ollama:
-    image: ollama/ollama:latest
-    container_name: fraud_dw_ollama
-    profiles:
-      - optional-services
+  # Phase 31 frontend: React + Vite app served by nginx.
+  # Proxies /api to the FastAPI backend on the Windows host
+  # (host.docker.internal:8000).
+  web:
+    build:
+      context: .
+      dockerfile: web/Dockerfile
+      args:
+        - VITE_API_BASE_URL=http://host.docker.internal:8000/api
+    container_name: fraud_dw_web
     restart: unless-stopped
     environment:
-      OLLAMA_NUM_GPU: "0"
+      VITE_API_BASE_URL: http://host.docker.internal:8000/api
     ports:
-      - "${OLLAMA_PORT:-11434}:11434"
+      - "${WEB_PORT:-5173}:80"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - fraud_dw_network
+
+  # MLflow Tracking Server (Phase 30 - EXT-03)
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.14.1
+    container_name: fraud_dw_mlflow
+    restart: unless-stopped
+    command: >
+      mlflow server
+      --backend-store-uri sqlite:////mlflow/mlflow.db
+      --default-artifact-root /mlflow/artifacts
+      --host 0.0.0.0
+      --port 5000
+    ports:
+      - "${MLFLOW_PORT:-5000}:5000"
     volumes:
-      - ollama_data:/root/.ollama
+      - mlflow_data:/mlflow
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:5000/health', timeout=5)\""]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
     networks:
       - fraud_dw_network
 
 volumes:
   postgres_data:
   ollama_data:
+  mlflow_data:
 
 networks:
   fraud_dw_network:

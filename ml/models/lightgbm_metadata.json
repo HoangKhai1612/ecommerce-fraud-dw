@@ -1,0 +1,41 @@
+{
+  "model_name": "lightgbm",
+  "model_version": "lightgbm-v1-phase30",
+  "random_state": 42,
+  "n_features": 1014,
+  "train_rows": 413378,
+  "validation_rows": 88581,
+  "train_fraud_rate": 0.034989767234831076,
+  "val_fraud_rate": 0.03499621815061921,
+  "scale_pos_weight": 27.5797842920354,
+  "hyperparameters": {
+    "n_estimators": 500,
+    "max_depth": 7,
+    "learning_rate": 0.05,
+    "num_leaves": 127,
+    "subsample": 0.8,
+    "colsample_bytree": 0.8
+  },
+  "metrics": {
+    "model": "LightGBM",
+    "roc_auc": 0.9476265165131962,
+    "pr_auc": 0.711474117462076,
+    "precision": 0.31172498465316145,
+    "recall": 0.8190322580645162,
+    "f1": 0.4515784793241441,
+    "threshold": 0.5,
+    "confusion_matrix": [
+      [
+        79875,
+        5606
+      ],
+      [
+        561,
+        2539
+      ]
+    ],
+    "prediction_time_seconds": 0.8492002487182617,
+    "training_time_seconds": 36.19201040267944
+  },
+  "training_timestamp": "2026-10-30T14:57:49Z"
+}

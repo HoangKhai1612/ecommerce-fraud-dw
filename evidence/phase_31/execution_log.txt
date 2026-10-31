@@ -1,0 +1,57 @@
+Phase 31 — Execution Log
+========================
+
+1. Frontend scaffold (web/):
+   - package.json: React 18 + TypeScript + Vite + react-router-dom
+   - vite.config.ts: proxy /api -> http://localhost:8000
+   - src/api.ts: fetch client (apiJson, apiRequest, API_BASE_URL)
+   - src/types.ts: PredictionRecord, PredictionListItem, PredictionsListResponse,
+                 TransactionSample, ServiceStatus, SystemStatusResponse, ExplainResponse
+   - src/components/Layout.tsx: sidebar navigation (6 pages)
+   - src/pages/Overview.tsx: service status + recent predictions
+   - src/pages/TransactionTesting.tsx: mode A (IEEE-CIS) + mode B (ecommerce-sim),
+                                      CSV batch, real XGBoost inference, AI explain
+   - src/pages/PredictionDetail.tsx: prediction detail + input payload
+   - src/pages/PredictionHistory.tsx: filters + pagination
+   - src/pages/AIAssistant.tsx: chat POST /ai/chat, optional ?prediction= context
+   - src/pages/SystemStatus.tsx: service status polling every 15s
+   - web/Dockerfile: multi-stage (node builder -> nginx)
+   - web/README.md: run/build/docker instructions
+   - tsc --noEmit: PASS (0 errors)
+   - npm run build: PASS (dist/ created, 199.44 kB JS)
+
+2. Backend (api/):
+   - api/config.py: AI_ASSISTANT_BASE_URL, OLLAMA_BASE_URL, LLM_MODEL env
+   - api/models.py: Phase 31 schemas (PredictionCreate, PredictionRecord,
+                   PredictionListItem, PredictionsListResponse, PredictionsFilter,
+                   PredictionDetail, ExplainRequest, ExplainResponse, ServiceStatus,
+                   SystemStatusResponse)
+   - api/database.py: ensure_history_table, insert_prediction_record,
+                      get_prediction_record, list_prediction_records, save_ai_explanation
+                      (table: marts.web_test_history, idempotent DDL)
+   - api/services/prediction_service.py: predict_and_save (real InferencePipeline),
+                                         get_record, list_records
+   - api/services/ai_service.py: AIService.explain (assistant 20s -> ollama 90s fallback)
+   - api/routes/predictions.py: POST /predictions, GET /predictions/{id},
+                               GET /predictions, POST /predictions/{id}/explain
+   - api/routes/transactions.py: added GET /transactions/sample (reordered before /{id})
+   - api/routes/health.py: added GET /system/status
+   - api/routes/ai.py: new POST /ai/chat (general + context-bound)
+   - api/main.py: routers included, lifespan ensures history table, version 1.1.0
+   - TestClient smoke test: STATUS/SAMPLE/PREDICT/GET/EXPLAIN/LIST all PASS
+
+3. Database:
+   - sql/31_web_test_history.sql: idempotent DDL for marts.web_test_history
+   - Applied to PostgreSQL ecommerce_fraud_dw (marts schema)
+
+4. Docker:
+   - docker-compose.yml: added web service (port 5173, VITE_API_BASE_URL)
+   - web/Dockerfile: nginx-served Vite build
+
+5. Tests:
+   - tests/test_phase31_api.py: 22 tests (endpoint-level via TestClient)
+   - tests/test_phase31_adapter.py: 6 tests (service + DB layer)
+   - Full suite: 198 passed, 1 skipped, 0 failed
+
+6. Smoke test rows cleaned:
+   - Deleted 19 rows from marts.web_test_history where transaction_id = 9000001

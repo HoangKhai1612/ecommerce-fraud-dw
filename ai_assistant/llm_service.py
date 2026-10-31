@@ -1,8 +1,6 @@
-"""Ollama-backed LLM service."""
+"""LLM service with provider abstraction."""
 
 from pathlib import Path
-
-from langchain_ollama import ChatOllama
 
 from ai_assistant.config import (
     LLM_MODEL,
@@ -11,22 +9,18 @@ from ai_assistant.config import (
     SYSTEM_PROMPT_PATH,
     SQL_GENERATE_PROMPT_PATH,
 )
+from ai_assistant.providers.factory import get_provider
 
 SYSTEM_PROMPT = SYSTEM_PROMPT_PATH.read_text(encoding="utf-8")
 SQL_PROMPT = SQL_GENERATE_PROMPT_PATH.read_text(encoding="utf-8")
 
-llm = ChatOllama(
-    model=LLM_MODEL,
-    base_url=OLLAMA_BASE_URL,
-    temperature=0,
-    validate_model_on_init=False,
-    client_kwargs={"timeout": LLM_TIMEOUT_SECONDS},
-)
+# Use provider abstraction
+_provider = get_provider()
 
 
 def _invoke(prompt: str) -> str:
-    response = llm.invoke(prompt)
-    return str(response.content).strip()
+    response = _provider.invoke(prompt)
+    return str(response).strip() if not isinstance(response, str) else response.strip()
 
 
 def classify_question(question: str) -> str:

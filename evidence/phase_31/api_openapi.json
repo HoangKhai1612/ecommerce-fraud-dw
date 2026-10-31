@@ -1,0 +1,17 @@
+{
+  "status_code": 200,
+  "paths": [
+    "/health",
+    "/ready",
+    "/system/status",
+    "/transactions/sample",
+    "/transactions/{transaction_id}",
+    "/transactions/predictions/top",
+    "/predict",
+    "/predictions",
+    "/predictions/{prediction_id}",
+    "/predictions/{prediction_id}/explain",
+    "/ai/chat",
+    "/"
+  ]
+}

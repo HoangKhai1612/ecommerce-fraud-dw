@@ -1,0 +1,26 @@
+{
+  "status_code": 200,
+  "body": {
+    "api": "ok",
+    "model": {
+      "name": "xgboost",
+      "status": "ok",
+      "detail": "Artifacts loaded"
+    },
+    "database": {
+      "name": "postgresql",
+      "status": "ok",
+      "detail": "marts schema reachable"
+    },
+    "ai": {
+      "name": "ai-assistant",
+      "status": "ok",
+      "detail": "AI Assistant reachable"
+    },
+    "ollama": {
+      "name": "ollama",
+      "status": "ok",
+      "detail": "Ollama reachable, model llama3 present"
+    }
+  }
+}

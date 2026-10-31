@@ -1,0 +1,95 @@
+{
+  "model_version": "xgboost-manual-v1",
+  "model_type": "XGBoost",
+  "training_mode": "manual-input",
+  "threshold": 0.8353390693664551,
+  "default_threshold": 0.5,
+  "features": [
+    "transaction_amt",
+    "transaction_hour",
+    "transaction_dayofweek",
+    "is_weekend",
+    "card1",
+    "addr1",
+    "addr2",
+    "dist1",
+    "dist2",
+    "c1",
+    "c2",
+    "c3",
+    "c4",
+    "c5",
+    "c6",
+    "c7",
+    "c8",
+    "c9",
+    "c10",
+    "c11",
+    "c12",
+    "c13",
+    "c14",
+    "d1",
+    "d2",
+    "d3",
+    "d4",
+    "d5",
+    "product_cd",
+    "card4",
+    "card6",
+    "p_emaildomain",
+    "r_emaildomain",
+    "device_type",
+    "m1",
+    "m2",
+    "m3",
+    "m4",
+    "m5",
+    "m6"
+  ],
+  "num_features": 28,
+  "cat_features": 12,
+  "total_features_raw": 40,
+  "total_features_processed": 125,
+  "train_size": 413378,
+  "val_size": 88581,
+  "test_size": 88581,
+  "fraud_rate_train": 0.034989767234831076,
+  "fraud_rate_val": 0.03499621815061921,
+  "fraud_rate_test": 0.03498492904798998,
+  "val_metrics": {
+    "roc_auc": 0.9380837130001726,
+    "pr_auc": null,
+    "precision": 0.25402776370452934,
+    "recall": 0.8087096774193548,
+    "f1": 0.38661423394247824,
+    "confusion_matrix": [
+      [
+        78119,
+        7362
+      ],
+      [
+        593,
+        2507
+      ]
+    ]
+  },
+  "test_metrics": {
+    "roc_auc": 0.9359115372714913,
+    "pr_auc": null,
+    "precision": 0.2520849880857824,
+    "recall": 0.819296547273314,
+    "f1": 0.3855439981778149,
+    "confusion_matrix": [
+      [
+        77949,
+        7533
+      ],
+      [
+        560,
+        2539
+      ]
+    ]
+  },
+  "scale_pos_weight": 27.5797842920354,
+  "random_state": 42
+}
