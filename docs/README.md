@@ -52,3 +52,6 @@ Xem các thư mục docs/0X_* và docs/1X_* để biết chi tiết về:
 
 ## Quick Start
 Xem [README.md](../README.md) ở root để biết cách chạy hệ thống.
+
+### Final Project Review
+- [Final Project Review](final_project_review/FINAL_PROJECT_REVIEW.md) - Complete review before thesis writing\n

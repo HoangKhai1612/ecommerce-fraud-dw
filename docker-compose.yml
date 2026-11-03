@@ -130,8 +130,11 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: ${POSTGRES_DB:-ecommerce_fraud_dw}
+      BATCH_PREDICTION_STORAGE_DIR: /app/batch_uploads
     ports:
       - "${API_PORT:-8000}:8000"
+    volumes:
+      - batch_predictions:/app/batch_uploads
     healthcheck:
       test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=5)\""]
       interval: 30s
@@ -220,6 +223,7 @@ services:
 
 volumes:
   postgres_data:
+  batch_predictions:
   ollama_data:
   mlflow_data:
 

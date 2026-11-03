@@ -1,7 +1,6 @@
 import { useEffect, useState, FormEvent } from "react";
 import { apiJson } from "../api";
 
-type Tab = "dw" | "manual";
 type Sample = {
   transaction_id: number;
   is_fraud: number;
@@ -24,7 +23,6 @@ const MINIMAL_FIELDS: { key: string; label: string; placeholder: string }[] = [
 ];
 
 export default function TransactionTesting() {
-  const [tab, setTab] = useState<Tab>("dw");
   const [form, setForm] = useState<Record<string, string>>({
     transaction_id: "",
     transaction_dt: "",
@@ -96,7 +94,7 @@ export default function TransactionTesting() {
 
   const buildPayload = (): Record<string, any> => {
     // For DW tab with selected sample: send ALL raw features from DW
-    if (tab === "dw" && rawFeatures && selectedSample && !modified) {
+    if (rawFeatures && selectedSample && !modified) {
       const payload: Record<string, any> = { ...rawFeatures };
       // Remove technical columns that shouldn't be features
       delete payload._loaded_at;
@@ -145,7 +143,7 @@ export default function TransactionTesting() {
 
       const res = await apiJson<any>("/predictions", {
         method: "POST",
-        body: JSON.stringify({ mode: tab === "manual" ? "ecommerce-sim" : "ieee-cis", transaction: payload }),
+        body: JSON.stringify({ mode: "ieee-cis", transaction: payload }),
       });
       setResult(res);
     } catch (e: any) {
@@ -171,17 +169,6 @@ export default function TransactionTesting() {
     }
   };
 
-  const switchTab = (t: Tab) => {
-    setTab(t);
-    setResult(null);
-    setAiAnswer(null);
-    setError(null);
-    setSelectedSample(null);
-    setRawFeatures(null);
-    setGroundTruth(null);
-    setModified(false);
-  };
-
   const isModifiedScenario = modified && selectedSample !== null;
 
   return (
@@ -192,22 +179,12 @@ export default function TransactionTesting() {
 
       <div className="card">
         <div className="btn-group" style={{ marginBottom: 16 }}>
-          <button
-            className={`btn ${tab === "dw" ? "btn-primary" : "btn-secondary"}`}
-            onClick={() => switchTab("dw")}
-          >
-            Tab 1 - Giao dich tu Data Warehouse
-          </button>
-          <button
-            className={`btn ${tab === "manual" ? "btn-primary" : "btn-secondary"}`}
-            onClick={() => switchTab("manual")}
-          >
-            Tab 2 - Du doan giao dich moi
+          <button className="btn btn-primary" type="button">
+            Kiểm thử giao dịch gian lận
           </button>
         </div>
 
-        {tab === "dw" && (
-          <>
+        <>
             <div style={{ fontSize: 13, color: "#94a3b8", marginBottom: 10 }}>
               Chon 1 trong 10 mau gian luan hoac 10 mau hop le tu Data Warehouse.
               Du lieu thuc te se duoc tu dong dien vao form.
@@ -328,80 +305,6 @@ export default function TransactionTesting() {
               </div>
             </div>
           </>
-        )}
-
-        {tab === "manual" && (
-          <>
-            <div className="alert alert-warn">
-              Che do nhap giao dich moi. XGBoost chay thuc su. Ket qua co the kem hon vi thieu feature.
-            </div>
-            <div className="form">
-              <div className="field">
-                <label>So tien giao dich (USD)</label>
-                <input
-                  value={form.transaction_amt}
-                  onChange={(ev) => setForm({ ...form, transaction_amt: ev.target.value })}
-                  placeholder="vd. 150.75"
-                  disabled={submitting}
-                />
-              </div>
-              <div className="field">
-                <label>Ma san pham</label>
-                <select
-                  value={form.product_cd}
-                  onChange={(ev) => setForm({ ...form, product_cd: ev.target.value })}
-                  disabled={submitting}
-                >
-                  <option value="">-- chon --</option>
-                  <option value="W">W</option>
-                  <option value="C">C</option>
-                  <option value="R">R</option>
-                  <option value="S">S</option>
-                  <option value="H">H</option>
-                </select>
-              </div>
-              <div className="field">
-                <label>Loai thiet bi</label>
-                <select
-                  value={form.device_type}
-                  onChange={(ev) => setForm({ ...form, device_type: ev.target.value })}
-                  disabled={submitting}
-                >
-                  <option value="">-- chon --</option>
-                  <option value="mobile">Mobile</option>
-                  <option value="desktop">Desktop</option>
-                </select>
-              </div>
-              <div className="field">
-                <label>Mien email nguoi gui</label>
-                <input
-                  value={form.p_emaildomain}
-                  onChange={(ev) => setForm({ ...form, p_emaildomain: ev.target.value })}
-                  placeholder="vd. gmail.com"
-                  disabled={submitting}
-                />
-              </div>
-              <div className="field">
-                <label>Ma giao dich (tuy chon)</label>
-                <input
-                  value={form.transaction_id}
-                  onChange={(ev) => setForm({ ...form, transaction_id: ev.target.value })}
-                  placeholder="bo trong de tu sinh"
-                  disabled={submitting}
-                />
-              </div>
-              <div className="field">
-                <label>TransactionDT (tuy chon)</label>
-                <input
-                  value={form.transaction_dt}
-                  onChange={(ev) => setForm({ ...form, transaction_dt: ev.target.value })}
-                  placeholder="vd. 86400"
-                  disabled={submitting}
-                />
-              </div>
-            </div>
-          </>
-        )}
 
         <div className="btn-group" style={{ marginTop: 10 }}>
           <button
@@ -427,13 +330,13 @@ export default function TransactionTesting() {
               <span className={result.is_fraud_predicted === 1 ? "label-fraud" : "label-legit"}>
                 {result.is_fraud_predicted === 1 ? "GIAN LUAN (1)" : "HOP LE (0)"}
               </span>
-              {tab === "dw" && groundTruth !== null && !modified && (
+              {groundTruth !== null && !modified && (
                 <span style={{ fontSize: 12, color: "#94a3b8", marginLeft: 8 }}>
                   (thuc te: {groundTruth === 1 ? "GIAN LUAN" : "HOP LE"})
                 </span>
               )}
             </div>
-            {tab === "dw" && groundTruth !== null && !modified && (
+            {groundTruth !== null && !modified && (
               <div className="detail-row">
                 <span className="k">Danh gia</span>
                 <span>
@@ -481,13 +384,17 @@ export default function TransactionTesting() {
                 onClick={handleExplain}
                 disabled={explaining || !result.prediction_id}
               >
-                {explaining ? "Dang giai thich (AI)..." : "Giai thich ket qua boi AI Assistant"}
+                {explaining ? "Đang phân tích các đặc trưng của mô hình..." : "Giải thích kết quả bằng TreeSHAP"}
               </button>
             </div>
             {aiAnswer && (
               <div className="ai-card">
-                <div className="ai-source">AI Assistant - Source: {aiAnswer.source}</div>
-                {aiAnswer.answer}
+                <div className="ai-source">
+                  {aiAnswer.source === "xgboost-tree-shap"
+                    ? "Giải thích mô hình XGBoost - TreeSHAP"
+                    : `AI Assistant - Source: ${aiAnswer.source}`}
+                </div>
+                <div style={{ whiteSpace: "pre-wrap" }}>{aiAnswer.answer}</div>
               </div>
             )}
           </div>

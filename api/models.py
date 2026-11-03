@@ -178,7 +178,7 @@ class ExplainResponse(BaseModel):
     prediction_id: Optional[UUID] = None
     answer: str
     ai_available: bool
-    source: Literal["ai-assistant", "ollama-direct", "unavailable"]
+    source: Literal["ai-assistant", "ollama-direct", "xgboost-tree-shap", "unavailable"]
     sql_query: Optional[str] = None
     results: Optional[list[dict[str, Any]]] = None
 

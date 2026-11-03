@@ -1,0 +1,12 @@
+# Đối chiếu dữ liệu và trạng thái báo cáo
+
+| Nội dung | Giá trị/Trạng thái dùng trong báo cáo | Nguồn trong repository | Ghi chú xác minh |
+|---|---|---|---|
+| So sánh mô hình Phase 30 | Logistic Regression: ROC-AUC 0,8700; PR-AUC 0,4859; Precision 0,8174; Recall 0,2845; F1 0,4221. Random Forest: 0,9130; 0,6452; 0,9259; 0,3626; 0,5211. XGBoost: 0,9160; 0,5913; 0,3160; 0,7135; 0,4381. LightGBM: 0,9476; 0,7115; 0,3117; 0,8190; 0,4516. | ml/models/model_comparison_phase30.json; docs/30_extension/lightgbm.md | Tập validation val.parquet, 88.581 mẫu; nguồn ghi rõ không dùng test set để chọn mô hình. |
+| Mô hình inference | XGBoost đang dùng trong API; LightGBM được huấn luyện/đánh giá nhưng chưa thay thế inference. | docs/final_audit/FINAL_ACCEPTANCE_CHECK.md; docs/31_integrated_platform/api_reference.md; ml/models/ | Tách biệt mô hình có chỉ số validation cao nhất với mô hình tích hợp inference. |
+| Giao diện | 12 trang/route được liệt kê cho ứng dụng thống nhất. | docs/31_web_integration/phase_31_overview.md; docs/final_audit/FINAL_ACCEPTANCE_CHECK.md | Build thành công được ghi nhận; đây không đồng nghĩa từng trang đã được kiểm tra browser trên mọi cấu hình. |
+| Lỗi tích hợp API | Các lỗi 404/422 được ghi nhận trước đó; Phase 32 báo cáo đã khắc phục và xác minh endpoint trọng yếu qua TestClient. | docs/32_full_system_validation/phase_32_overview.md; docs/final_audit/FINAL_ACCEPTANCE_CHECK.md | Trình bày lỗi cũ như lịch sử và cập nhật trạng thái sau sửa. |
+| Data Warehouse | fact_transactions: 590.540 hàng, 438 cột; dim_date 183, dim_product 22, dim_device 1.939 hàng. | Báo cáo nguồn BAO_CAO_DO_AN_HOAN_THIEN_CHUONG_4.docx, mục 4.2; docs/08_data_model/ | Đây là số ghi nhận trong tài liệu báo cáo hiện có; không truy vấn database trực tiếp trong lượt này. |
+| Phiên bản công nghệ | dbt 1.12.1; PostgreSQL adapter 1.11.0; Metabase 0.49 được ghi nhận. | BAO_CAO_DO_AN_HOAN_THIEN_CHUONG_4.docx, mục 4.1; docs/ | Các phiên bản khác không được khẳng định nếu thiếu khóa phiên bản/nguồn rõ ràng. |
+| Ảnh Chương 4 | DOCX nguồn có chỉ dẫn chèn hình nhưng không có ảnh nhúng trong phần Chương 4. | BAO_CAO_DO_AN_HOAN_THIEN_CHUONG_4.docx | Không tái tạo ảnh giao diện. Xem REPORT_MISSING_EVIDENCE.md để biết ảnh cần chụp từ lần demo. |
+| Kiểm tra bố cục DOCX | Gói DOCX mới được kiểm tra cấu trúc XML và nội dung; renderer không chạy trong môi trường này. | Kết quả thao tác của lượt biên tập | Chưa xác minh trực quan từng trang; cần mở bằng Microsoft Word/LibreOffice và cập nhật mục lục trước khi in. |
